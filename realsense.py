@@ -1,6 +1,8 @@
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 
+print("hello")
+
 class RealSense:
     def __init__(self):
         width = 1280
