@@ -1,10 +1,12 @@
+import cv2
 from argparse import ArgumentParser
-from neuralNet import *
+from objectDetection import objectDetection
+from frameImport import frameImport
 
 
 def main():
     parser = ArgumentParser(description='LOTICv2')
-    parser.add_argument('VideoSource', type=str, help='identify your video source i.e. IP camera source')
+    parser.add_argument('VideoSource', type=str, help='identify your video source, using "realsense" will result in use with realsense camera')
     parser.add_argument('WeightsFile', type=str, help='YOLO weight file')
     parser.add_argument('ConfigFile', type=str, help='YOLO configuration file')
     parser.add_argument('NamesFile', type=str, help='YOLO class names file')
@@ -16,12 +18,16 @@ def main():
     parser.add_argument('MediaOutput', type=str, default='image', help='image or video output (note video output will bog down throughput')
     args = parser.parse_args()
     
-    od = objectDetection()
-    od.loadNN(args)
+    od = objectDetection(args.ConfidenceActivation, args.WeightFile, args.ConfigFile, args.NamesFile) #initialize class list and model params
+    fi = frameImport(args.VideoSource) #takes in args flag for video file and chooses between intel realsense camera
+    color_frame = fi.loadFrame()
+    od.loadNN()
 
     while cv2.waitKey(1) < 1:
-        frameImport()
-        od.detection()
+        grabbed, frame = color_frame.read()
+        if not grabbed:
+            break
+        classes, scores, boxes = od.detection(frame)
         objectTracker()
         etc . . .
 

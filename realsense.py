@@ -3,7 +3,7 @@ import numpy as np
 
 print("hello")
 
-class RealSense:
+class realsense:
     def __init__(self):
         width = 1280
         height = 720
