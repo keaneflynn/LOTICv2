@@ -20,3 +20,10 @@ git commit -m "thoughtful commit message"
 git push origin TemporaryBranchName
 ```
 Proceed to make a pull request on the GitHub UI and I will merge the pull request. 
+
+Final step from terminal:
+```
+git checkout main
+git branch -D TemporaryBranchName
+git pull
+```
