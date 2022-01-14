@@ -13,12 +13,12 @@ class objectTracker:
         self.stream_side = stream_side
         self.exit_threshold = exit_threshold
 
-    def tracker(self):
-
-    def classLock(self):
-
-    def maxConf(self):
-
-    def travelDirection(self):
-
-    def objectLength(self): #Keane project for realsense shit
+#    def tracker(self):
+#
+#    def classLock(self):
+#
+#    def maxConf(self):
+#
+#    def travelDirection(self):
+#
+#    def objectLength(self): #Keane project for realsense shit
