@@ -4,6 +4,7 @@ import multiprocessing as mp
 from argparse import ArgumentParser
 from objectDetection import objectDetection
 from frameImport import frameImport
+from objectTracker import objectTracker
 
 
 def main():
@@ -31,13 +32,15 @@ def main():
         grabbed, frame = color_frame.read() #add multithreading
         if not grabbed:
             break
-        classes, scores, boxes = od.detection(color_frame) 
-        ot = objectTracker(color_frame, 
+        classes, scores, boxes = od.detection(frame) 
+        ot = objectTracker(frame, 
                       classes,
                       scores,
                       boxes,
                       args.stream_side,
                       args.exit_threshold)
+
+        od.testOutputFrames(frame, classes, scores, boxes)
 
 if __name__ == '__main__':
     main()
