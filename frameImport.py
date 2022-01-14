@@ -1,5 +1,4 @@
 import cv2
-from realsense import realsense
 
 class frameImport:
     def __init__(self, video_input):
@@ -8,6 +7,7 @@ class frameImport:
     def loadFrame(self):
         #Condition for grabbing frames from Intel RealSense camera
         if self.video_input == 'realsense':
+            from realsense import realsense
             rs = realsense()
             ret, depth_frame, color_frame = rs.grab_frame() #pulls info from intel camera (we are interested in the color_frame)          
         else:       
