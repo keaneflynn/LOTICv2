@@ -10,9 +10,9 @@ class objectDetection:
         self.weights_file = weights_file
         self.config_file = config_file
 
-        class_names = []
+        self.class_names = []
         with open(names_file, "r") as f:
-            class_names = [cname.strip() for cname in f.readlines()]
+            self.class_names = [cname.strip() for cname in f.readlines()]
 
     def loadNN(self):
         os_name = platform.system()
@@ -28,5 +28,15 @@ class objectDetection:
         self.model = cv2.dnn_DetectionModel(net)
         self.model.setInputParams(size=(416, 416), scale=1/255, swapRB=True)
 
-    def detection(self, frame):
-        classes, scores, boxes = self.model.detect(frame, self.confidence, self.nmsThreshold)
+    def detection(self, color_frame):
+        classes, scores, boxes = self.model.detect(color_frame, self.confidence, self.nmsThreshold)
+
+	return classes, scores, boxes
+
+    def testOutputFrames(self, classes, scores, boxes)
+	for (class_id, confidence, bounding_box) in zip(classes, scores, boxes):
+	    label = "%s" % (self.class_names[class_id[0]])
+	    cv2.rectangle(color_frame, bounding_box, self.color, 2)
+	    cv2.putText(color_frame, label, (box[0], box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+	
+	cv2.imshow("detections", color_frame)

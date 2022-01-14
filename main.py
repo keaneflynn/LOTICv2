@@ -31,8 +31,8 @@ def main():
         grabbed, frame = color_frame.read() #add multithreading
         if not grabbed:
             break
-        classes, scores, boxes = od.detection(frame) 
-        ot = objectTracker(frame, 
+        classes, scores, boxes = od.detection(color_frame) 
+        ot = objectTracker(color_frame, 
                       classes,
                       scores,
                       boxes,
