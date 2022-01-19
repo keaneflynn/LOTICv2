@@ -32,13 +32,12 @@ def main():
         grabbed, frame = color_frame.read() #add multithreading
         if not grabbed:
             break
-        classes, scores, boxes = od.detection(frame) 
-        ot = objectTracker(frame, 
-                      classes,
-                      scores,
-                      boxes,
-                      args.stream_side,
-                      args.exit_threshold)
+        classes, scores, boxes = od.detection(frame)
+
+
+        ot = objectTracker(args.stream_side)
+        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class_id, score, box]
+        tracked_fish = ot.update_tracker(classes, scores, boxes, frame)
 
         od.testOutputFrames(frame, classes, scores, boxes)
 
