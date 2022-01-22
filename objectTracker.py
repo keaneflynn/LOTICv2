@@ -6,6 +6,7 @@ class Detection:
     def __init__(self, class_id, score, box):
         self.class_id = class_id
         self.score = score
+        self.box = box
         self.center = [box[0], box[1]]
 
 
@@ -19,14 +20,15 @@ class Fish:
         self.box = box
         self.center = [box[0], box[1]]
         self.max_confidence = score
+        self.score = score
         self.max_c_frame = frame
         self.hit_streak = 0
         self.frames_without_hit = 0
 
-    def update_fish(self, box, score, frame):
+    def update_fish(self, center, score, frame):
         #updates state of tracked objects
         self.hit_streak += 1
-        self.center = [box[0], box[1]]
+        self.center = center
         self.frames_without_hit = 0
         if score > self.max_confidence:
             self.max_confidence = score
@@ -42,8 +44,33 @@ class Fish:
         # return self.center
 
 
-def dist(center1, center2):
+def distance(center1, center2):
     return math.hypot(center1[0] - center2[0], center1[1] - center2[1])
+
+
+def association(tracks, detections, min_distance):
+    if len(tracks) == 0:
+        return np.empty((0, 2), dtype=int), np.arange(len(detections))
+
+    dets = []
+    ls = np.arange(len(detections))
+    for i, de in zip(ls, detections):
+        dets.append([i, de])
+
+    matched_indices = []
+    for t, trk in enumerate(tracks):
+        for d in dets:
+            dist = distance(trk, d[1])
+            if dist <= min_distance:
+                matched_indices.append([t, d[0]])
+                dets.remove(d)
+                break
+
+    unmatched_detection_indices = []
+    for i in dets:
+        unmatched_detection_indices.append(i[0])
+
+    return matched_indices, unmatched_detection_indices
 
 
 class objectTracker:
@@ -53,16 +80,15 @@ class objectTracker:
         self.max_age = exit_threshold
         self.min_hits = min_hits
         self.min_distance = min_distance
+        # list of Fish objects detected
         self.tracked_objects = []
         self.frame_count = 0
+        # list of final objects tracked in the form [fish_id, class_id, score, box]
+        # self.frame_final_objects = []
 
     def update_tracker(self, classes, scores, boxes, frame):
         self.frame_count += 1
-        # ret = list of tracked_objects that pass min_hits and max_age filter in the form
-        # [fish_id, class_id, score, box]
-        ret = []
 
-        # predict called first, update_fish called next
         # predicts current frame location of tracked_objects using previous frame information
         predicted_center_points = []
         for t in self.tracked_objects:
@@ -77,24 +103,36 @@ class objectTracker:
             dets.append(det)
             dets_center_points.append(det.center)
 
-        # check associations: given predicted_center_points and dets_center_points return matches,  in the form of a
-        # 2d array with shape(n, 2) where column 0 = index in tracked items and column 1 = index in dets
-
-        # handling matches - don't create new tracklet, update tracklet position do it in the double loop
-
-
-
+        # association: given predicted_center_points and dets_center_points return matches, a
+        # 2d list with shape(n, 2) where each row represents a match, column 0 = index in tracked_objects, and
+        # column 1 = index in dets, and unmatched detections a
+        matches, umd = association(predicted_center_points, dets_center_points, self.min_distance)
 
         # update all tracked_objects in matches with respective detections
+        for m in matches:
+            c = dets[m[1]].center
+            s = dets[m[1]].score
+            self.tracked_objects[m[0]].update_fish(c, s, frame)
 
         # initialize new fish for unmatched detections and append to tracked_objects
+        for u in umd:
+            new_fish = Fish(dets[u].class_id, dets[u].score, dets[u].box, frame)
+            self.tracked_objects.append(new_fish)
 
-        # filter out dead tracked items - happens by evaluating fish.frames_without_update - predict is called on all
-        # tracked objects by update is only called on matches
+        ret = []
+        # self.frame_final_objects = []
+        # filter out dead tracked items, append ret with passing tracked_objects, and return ret
+        for obj in self.tracked_objects:
+            if obj.frames_without_hit >= self.max_age:
+                self.tracked_objects.pop(obj)
+            if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
+                r = [obj.fish_id, obj.class_id, obj.score, obj.box]
+                ret.append(r)
 
-        # append ret with passing tracked_objects and return ret
+        return ret 
 
-        return ret
+
+
 
 
 

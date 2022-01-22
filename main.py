@@ -34,7 +34,6 @@ def main():
             break
         classes, scores, boxes = od.detection(frame)
 
-
         ot = objectTracker(args.stream_side)
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class_id, score, box]
         tracked_fish = ot.update_tracker(classes, scores, boxes, frame)
