@@ -25,6 +25,7 @@ def main():
                          args.config_file,
                          args.names_file) #initialize class list and model params
     fi = frameImport(args.video_source) #takes in args flag for video file and chooses between intel realsense camera
+    fps = video.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks
     color_frame = fi.loadFrame()
     od.loadNN()
 
