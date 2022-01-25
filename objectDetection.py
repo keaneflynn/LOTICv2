@@ -33,10 +33,24 @@ class objectDetection:
 
         return classes, scores, boxes
 
+    '''
+    previous version
     def testOutputFrames(self, frame, classes, scores, boxes):
         for (class_id, confidence, bounding_box) in zip(classes, scores, boxes):
             label = "%s" % (self.class_names[class_id[0]])
             cv2.rectangle(frame, bounding_box, self.color, 2)
             cv2.putText(frame, label, (bounding_box[0], bounding_box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.color, 2)
     
+        cv2.imshow("detections", frame)
+    '''
+
+    # version compatible with tracker output
+    def testOutputFrames2(self, frame, tracked):
+        # fish_id, class , score, box
+
+        for t in tracked:
+            label = "%s" % (self.class_names[t[1]] + ", id: " + str(t[0]) + ", max_score: " + str(t[2]))
+            cv2.rectangle(frame, t[3], self.color, 2)
+            cv2.putText(frame, label, (t[3][0], t[3][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.5,
+                        self.color, 6)
         cv2.imshow("detections", frame)

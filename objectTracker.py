@@ -25,10 +25,11 @@ class Fish:
         self.hit_streak = 0
         self.frames_without_hit = 0
 
-    def update_fish(self, center, score, frame):
+    def update_fish(self, box, score, frame):
         #updates state of tracked objects
         self.hit_streak += 1
-        self.center = center
+        self.box = box
+        self.center = [box[0], box[1]]
         self.frames_without_hit = 0
         if score > self.max_confidence:
             self.max_confidence = score
@@ -38,8 +39,8 @@ class Fish:
         #checks if hitstreak needs to be reset
         #updates frames without hit
         #returns predicted location
-        if self.frames_without_hit > 0:
-            self.hit_streak = 0
+        # if self.frames_without_hit > 4:
+         #   self.hit_streak = 0
         self.frames_without_hit += 1
         # return self.center
 
@@ -75,8 +76,8 @@ def association(tracks, detections, min_distance):
 
 class objectTracker:
 
-    def __init__(self, stream_side, exit_threshold=2, min_hits=3, min_distance=0.06):
-        self.stream_side = stream_side
+    def __init__(self, exit_threshold, min_hits, min_distance):
+        # self.stream_side = stream_side
         self.max_age = exit_threshold
         self.min_hits = min_hits
         self.min_distance = min_distance
@@ -84,16 +85,17 @@ class objectTracker:
         self.tracked_objects = []
         self.frame_count = 0
         # list of final objects tracked in the form [fish_id, class_id, score, box]
-        # self.frame_final_objects = []
+
 
     def update_tracker(self, classes, scores, boxes, frame):
         self.frame_count += 1
 
         # predicts current frame location of tracked_objects using previous frame information
         predicted_center_points = []
-        for t in self.tracked_objects:
-            t.predict()
-            predicted_center_points.append(t.center)
+        to_ind = np.arange(len(self.tracked_objects))
+        for t in to_ind:
+            self.tracked_objects[t].predict()
+            predicted_center_points.append(self.tracked_objects[t].center)
 
         # format detections
         dets = []
@@ -103,6 +105,7 @@ class objectTracker:
             dets.append(det)
             dets_center_points.append(det.center)
 
+
         # association: given predicted_center_points and dets_center_points return matches, a
         # 2d list with shape(n, 2) where each row represents a match, column 0 = index in tracked_objects, and
         # column 1 = index in dets, and unmatched detections a
@@ -110,9 +113,9 @@ class objectTracker:
 
         # update all tracked_objects in matches with respective detections
         for m in matches:
-            c = dets[m[1]].center
+            b = dets[m[1]].box
             s = dets[m[1]].score
-            self.tracked_objects[m[0]].update_fish(c, s, frame)
+            self.tracked_objects[m[0]].update_fish(b, s, frame)
 
         # initialize new fish for unmatched detections and append to tracked_objects
         for u in umd:
@@ -120,16 +123,23 @@ class objectTracker:
             self.tracked_objects.append(new_fish)
 
         ret = []
-        # self.frame_final_objects = []
+
+        to = []
         # filter out dead tracked items, append ret with passing tracked_objects, and return ret
         for obj in self.tracked_objects:
+            to.append(obj.fish_id)
+
             if obj.frames_without_hit >= self.max_age:
-                self.tracked_objects.pop(obj)
+                self.tracked_objects.remove(obj)
+                continue
+
             if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                r = [obj.fish_id, obj.class_id, obj.score, obj.box]
+                r = [obj.fish_id, obj.class_id, obj.max_confidence, obj.box]
                 ret.append(r)
 
-        return ret 
+        if len(ret) == 0:
+            return np.empty((0,4)), to
+        return ret, to
 
 
 

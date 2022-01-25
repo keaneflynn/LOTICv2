@@ -8,6 +8,7 @@ from objectTracker import objectTracker
 
 
 def main():
+    '''
     parser = ArgumentParser(description='LOTICv2')
     parser.add_argument('video_source', type=str, help='identify your video source, using "realsense" will result in use with realsense camera')
     parser.add_argument('weights_file', type=str, help='YOLO weight file')
@@ -28,6 +29,26 @@ def main():
     fps = video.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks
     color_frame = fi.loadFrame()
     od.loadNN()
+    '''
+
+    # tracker testing w hardcoded variables
+
+    confidence = 0.09
+    weights = "models/yolov4-tiny-fish.weights"
+    config = "models/yolov4-tiny-fish.cfg"
+    name = "models/yolov4-tiny-fish.names"
+    vid = "media/coho-steelhead-test-short.mov"
+
+    od = objectDetection(confidence, weights, config, name)
+    fi = frameImport(vid)
+    color_frame = fi.loadFrame()
+    od.loadNN()
+
+    # below are optimal tracker parameters for fish model and test video
+    max_tracker_age = 26
+    min_tracker_hits = 2
+    min_pixel_distance = 270
+    ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1) < 1:
         grabbed, frame = color_frame.read() #add multithreading
@@ -35,11 +56,24 @@ def main():
             break
         classes, scores, boxes = od.detection(frame)
 
-        ot = objectTracker(args.stream_side)
-        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class_id, score, box]
-        tracked_fish = ot.update_tracker(classes, scores, boxes, frame)
+        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
 
-        od.testOutputFrames(frame, classes, scores, boxes)
+        tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
+
+        ''' 
+        test stuff
+        tf = []
+        for i in tracked_fish:
+            tf.append(i[0])
+
+        print(tf)
+        print(tracklets)
+        print("/n")    
+        '''
+
+        od.testOutputFrames2(frame, tracked_fish)
+        print(tracklets)
+
 
 if __name__ == '__main__':
     main()
