@@ -142,16 +142,14 @@ class objectTracker:
         return ret, to
 
 
+class depthMapping:
 
+    def __init__(self, depth_frame, boxes, tracked_fish):
+        self.depth_frame = depth_frame
+        self.center = [boxes[1],boxes[0]] #realsense coordinates are y,x rather than x,y
+        self.tracked_fish = tracked_fish 
 
-
-
-#    def tracker(self):
-#
-#    def classLock(self):
-#
-#    def maxConf(self):
-#
-#    def travelDirection(self):
-#
-#    def objectLength(self): #Keane project for realsense shit
+    def getLengths(self):
+        frameDetection_lengths = []
+        for tf in self.tracked_fish:
+            frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]

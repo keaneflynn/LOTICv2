@@ -1,3 +1,4 @@
+from math import floor
 import cv2
 import multiprocessing as mp
 
@@ -26,14 +27,18 @@ def main():
                          args.config_file,
                          args.names_file) #initialize class list and model params
     fi = frameImport(args.video_source) #takes in args flag for video file and chooses between intel realsense camera
-    fps = video.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks
+    if args.video_source == 'realsense':
+        ret, depth_frame, color_frame = fi.loadFrame_rs()
+    else:
+        color_frame = fi.loadFrame()
     color_frame = fi.loadFrame()
+    fps = video.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks    
     od.loadNN()
     '''
 
     # tracker testing w hardcoded variables
 
-    confidence = 0.09
+    confidence = 0.05
     weights = "models/yolov4-tiny-fish.weights"
     config = "models/yolov4-tiny-fish.cfg"
     name = "models/yolov4-tiny-fish.names"
@@ -42,12 +47,13 @@ def main():
     od = objectDetection(confidence, weights, config, name)
     fi = frameImport(vid)
     color_frame = fi.loadFrame()
+    fps = color_frame.get(cv2.CAP_PROP_FPS)
     od.loadNN()
 
     # below are optimal tracker parameters for fish model and test video
-    max_tracker_age = 26
-    min_tracker_hits = 2
-    min_pixel_distance = 270
+    max_tracker_age = floor(fps)/1 #where 1 is number of seconds# #26 for testing#
+    min_tracker_hits = 2 #2 for testing
+    min_pixel_distance = 270 #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1) < 1:
@@ -59,6 +65,9 @@ def main():
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
 
         tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
+
+        #dm = depthMapping(depth_frame, boxes, tracked_fish)
+        #dm.grabForkLength()
 
         ''' 
         test stuff
@@ -72,7 +81,8 @@ def main():
         '''
 
         od.testOutputFrames2(frame, tracked_fish)
-        print(tracklets)
+        #print(tracklets)
+        #print(tracked_fish)
 
 
 if __name__ == '__main__':
