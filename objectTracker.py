@@ -144,12 +144,28 @@ class objectTracker:
 
 class depthMapping:
 
-    def __init__(self, depth_frame, boxes, tracked_fish):
+    def __init__(self, depth_frame, tracked_fish):
+        self.sensor_width_mm = 3.60
+        self.sensor_height_mm = 2.10
+        self.focal_length = 1.88
+        self.image_width_pixels = 1280
+        self.image_height_pixels = 720
+        
         self.depth_frame = depth_frame
-        self.center = [boxes[1],boxes[0]] #realsense coordinates are y,x rather than x,y
-        self.tracked_fish = tracked_fish 
+        self.tracked_fish = tracked_fish
+
+        self.frameDetection_lengths = []
 
     def getLengths(self):
-        frameDetection_lengths = []
+        center_points = []
+        object_depth = []
+        box_width = [] #figure this out tomorrow
         for tf in self.tracked_fish:
-            frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]
+            center_points = (tf[3][1], tf[3][0])
+            #box_width = #figure this out tomorrow
+            object_depth = self.depth_frame[center_points]
+            object_length = self.frameDetection_lengths.append((object_depth[tf] * self.box_width[tf] * self.sensor_width_mm) / (self.focal_length * self.image_width_pixels))
+            
+            #frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]
+
+    #def updateMedianLength(self):
