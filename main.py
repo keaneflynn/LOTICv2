@@ -56,17 +56,22 @@ def main():
     min_pixel_distance = 270 #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
-    while cv2.waitKey(1) < 1:
+    while cv2.waitKey(1):
+        if vid == 'realsense': #if args.video_source == 'realsense':# #Current variable name for testing only
+            grabbed_depth, depth_frame = depth_frame.read()
         grabbed, frame = color_frame.read() #add multithreading
         if not grabbed:
             break
+
+
         classes, scores, boxes = od.detection(frame)
 
-        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
 
+        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
         tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
 
-        #dm = depthMapping(depth_frame, boxes, tracked_fish)
+
+        #dm = depthMapping(depth_frame, tracked_fish)
         #dm.grabForkLength()
 
         ''' 

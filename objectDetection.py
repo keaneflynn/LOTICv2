@@ -45,11 +45,10 @@ class objectDetection:
     '''
 
     # version compatible with tracker output
-    def testOutputFrames2(self, frame, tracked):
+    def testOutputFrames2(self, frame, tracked_fish):
         # fish_id, class , score, box
 
-        for t in tracked:
-            print(t)
+        for t in tracked_fish:
             label = "%s" % (self.class_names[t[1][0]] + ", id: " + str(t[0]) + ", max_score: " + str(t[2]))
             cv2.rectangle(frame, t[3], self.color, 2)
             cv2.putText(frame, label, (t[3][0], t[3][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.5,
