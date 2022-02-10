@@ -1,5 +1,21 @@
 import json
 import numpy as np
+import time
+
+class output:
+        def __init__ (self, exit_threshold, sitename, tracked_fish, classes, frame):
+                self.sitename = sitename
+                self.frame = frame
+                self.detection = len(classes)
+                self.exit_threshold = exit_threshold
+                
+                
+
+        def outputLoop (self):
+                sequential_frameID = 1
+                while self.detection > 0:
+                        sequential_frameID += 1
+                        
 
 class jsonOut:
 	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
@@ -37,3 +53,7 @@ class jsonOut:
 		}
 
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
+
+
+
+
