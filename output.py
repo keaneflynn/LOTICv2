@@ -45,10 +45,10 @@ class jsonOut:
 
 class output:
 	def __init__(self, exit_threshold, sitename, tracked_fish, classes, frame):
-    	self.sitename = sitename
-        self.frame = frame
-        self.detection = len(classes)
-        self.exit_threshold = exit_threshold
+		self.sitename = sitename
+		self.frame = frame
+		self.detection = len(classes)
+		self.exit_threshold = exit_threshold
                        
 
 	def outputLoop(self):

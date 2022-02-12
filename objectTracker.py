@@ -167,5 +167,9 @@ class depthMapping:
             object_length = self.frameDetection_lengths.append((object_depth[tf] * self.box_width[tf] * self.sensor_width_mm) / (self.focal_length * self.image_width_pixels))
             
             #frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]
+        return object_length
 
-    #def updateMedianLength(self):
+    def updateAverageLength(self):
+        ###Use time to set breakout threshold. If theshold is exceeded then break function###
+        self.objectLengths = getLenths()
+        
