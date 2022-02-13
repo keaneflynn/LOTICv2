@@ -4,7 +4,7 @@ import multiprocessing as mp
 
 from argparse import ArgumentParser
 from objectDetection import objectDetection
-from frameImport import frameImport
+from frameImport import *
 from objectTracker import objectTracker
 
 
@@ -26,13 +26,16 @@ def main():
                          args.weights_file,
                          args.config_file,
                          args.names_file) #initialize class list and model params
-    fi = frameImport(args.video_source) #takes in args flag for video file and chooses between intel realsense camera
+
     if args.video_source == 'realsense':
-        ret, depth_frame, color_frame = fi.loadFrame_rs()
+        from realsense import realsense
+        rs = realsense()
+        fps = rs.getFPS()
     else:
-        color_frame = fi.loadFrame()
-    color_frame = fi.loadFrame()
-    fps = video.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks    
+        fi = frameImport(args.video_source) #takes in args flag for video source and creates pipeline for frame import
+        color_frame = fi.loadFrame() #frame source
+        fps = color_frame.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks 
+
     od.loadNN()
     '''
 
@@ -51,15 +54,16 @@ def main():
     od.loadNN()
 
     # below are optimal tracker parameters for fish model and test video
-    max_tracker_age = floor(fps)/1 #where 1 is number of seconds# #26 for testing#
+    max_tracker_age = floor(fps)/1 #where denominator is number of seconds# #26 for testing#
     min_tracker_hits = 2 #2 for testing
     min_pixel_distance = 270 #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1):
         if vid == 'realsense': #if args.video_source == 'realsense':# #Current variable name for testing only
-            grabbed_depth, depth_frame = depth_frame.read()
-        grabbed, frame = color_frame.read() #add multithreading
+            grabbed, depth_frame, frame = rs.grab_frame()
+        else:
+            grabbed, frame = color_frame.read() #add multithreading
         if not grabbed:
             break
 
