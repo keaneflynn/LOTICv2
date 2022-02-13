@@ -144,19 +144,18 @@ class objectTracker:
 
 class depthMapping:
 
-    def __init__(self, depth_frame, tracked_fish):
+    def __init__(self):
         self.sensor_width_mm = 3.60
         self.sensor_height_mm = 2.10
         self.focal_length = 1.88
         self.image_width_pixels = 1280
         self.image_height_pixels = 720
-        
-        self.depth_frame = depth_frame
-        self.tracked_fish = tracked_fish
 
         self.frameDetection_lengths = []
 
-    def getLengths(self):
+    def getLengths(self, depth_frame, tracked_fish):
+        self.depth_frame = depth_frame
+        self.tracked_fish = tracked_fish
         center_points = []
         object_depth = []
         box_width = [] #figure this out tomorrow
