@@ -5,17 +5,20 @@ print("hello")
 
 class realsense:
     def __init__(self):
-        width = 1280
-        height = 720
+        self.width = 1280
+        self.height = 720
         self.fps = 30
         self.pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, width, height, rs.format.z16, self.fps)
-        config.enable_stream(rs.stream.color, width, height, rs.format.bgr8, self.fps)
+        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
+        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
         self.pipeline.start(config)
 
     def getFPS(self):
         return self.fps
+
+    def getFrameWidth(self):
+        return self.width
 
     def grab_frame(self):
         frame = self.pipeline.wait_for_frames()

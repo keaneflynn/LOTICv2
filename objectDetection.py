@@ -5,7 +5,7 @@ class objectDetection:
     def __init__(self, confidence_activation, weights_file, config_file, names_file):
         self.confidence = confidence_activation
         self.nmsThreshold = 0.2
-        self.color = (0, 255, 255)
+        #self.color = (0, 255, 255)
 
         self.weights_file = weights_file
         self.config_file = config_file
@@ -33,8 +33,14 @@ class objectDetection:
 
         return classes, scores, boxes
 
-    '''
-    previous version
+
+class outputTesting:
+    def __init__(self, names_file):
+        self.color = (0, 255, 255)
+        self.class_names = []
+        with open(names_file, 'r') as f:
+            self.class_names = [cname.strip() for cname in f.readlines()]
+
     def testOutputFrames(self, frame, classes, scores, boxes):
         for (class_id, confidence, bounding_box) in zip(classes, scores, boxes):
             label = "%s" % (self.class_names[class_id[0]])
@@ -42,10 +48,8 @@ class objectDetection:
             cv2.putText(frame, label, (bounding_box[0], bounding_box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.color, 2)
     
         cv2.imshow("detections", frame)
-    '''
 
-    # version compatible with tracker output
-    def testOutputFrames2(self, frame, tracked_fish):
+    def testOutputFrames2(self, frame, tracked_fish): # version compatible with tracker output
         # fish_id, class , score, box
 
         for t in tracked_fish:
