@@ -42,6 +42,8 @@ class jsonOut:
 
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
 
+class jsonOut_rs:
+	def __init__(self):
 
 class output:
 	def __init__(self, exit_threshold, sitename, tracked_fish, classes, frame):

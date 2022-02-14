@@ -142,6 +142,15 @@ class objectTracker:
         return ret, to
 
 
+class direction:
+    def __init__(self, tracked_fish):
+        self.xCoord = tracked_fish[3][0]
+        self.direction_countID = 0
+
+    def firstCoords(self):
+        test
+
+
 class depthMapping:
 
     def __init__(self):
