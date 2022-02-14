@@ -88,8 +88,8 @@ def main():
 
 
         #for tf in tracked_fish:
-        #    file = jsonUpdate()
         #    direction = directionTrackerUpdate()
+        #    file = jsonUpdate()
         #    if args.video_source == 'realsense':
         #        fork_length = updateAverageLength(depth_frame, tracked_fish)
 
