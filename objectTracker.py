@@ -151,7 +151,7 @@ class direction:
             if self.detection:
                 if first_detection: 
                     self.latest_coord = self.xCoord
-                else:
+                #else:
                     #keep most recent result
 
             else:
