@@ -9,7 +9,6 @@ class jsonOut:
 		self.species = 
 		self.confidence =
 		self.travelDirection = 
-		self.fishLength =
 
 	def jsonOutputUpdate(self):
 
@@ -43,17 +42,24 @@ class jsonOut:
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
 
 class jsonOut_rs:
-	def __init__(self):
+	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
+		self.dateTime = 
+		self.site = sitename
+		self.species = 
+		self.confidence =
+		self.travelDirection = 
+		self.fishLength =
+
 
 class output:
-	def __init__(self, exit_threshold, sitename, tracked_fish, classes, frame):
+	def __init__(self, exit_threshold, sitename, classes, frame):
 		self.sitename = sitename
 		self.frame = frame
 		self.detection = len(classes)
 		self.exit_threshold = exit_threshold
                        
 
-	def outputLoop(self):
+	def outputLoop(self, tracked_fish):
 		outfileID = 0
 		frames_since_detection = 0
 		while grabbed: #Condition: video frame is successfully imported 
