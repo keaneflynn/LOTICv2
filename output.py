@@ -25,7 +25,19 @@ class jsonOut:
 		}
 
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
-                json.dump(json_out, f)
+            json.dump(json_out, f)
+
+
+class jsonOut_rs:
+	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
+		self.dateTime = 
+		self.site = sitename
+		self.species = 
+		self.confidence =
+		self.travelDirection = 
+		self.fishLength =
+
+	def jsonOutputUpdate_rs(self):
 
 	def writeFile_rs(self):
 		directory = 'outfile'
@@ -40,15 +52,7 @@ class jsonOut:
 		}
 
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
-
-class jsonOut_rs:
-	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
-		self.dateTime = 
-		self.site = sitename
-		self.species = 
-		self.confidence =
-		self.travelDirection = 
-		self.fishLength =
+			json.dump(json_out, f)
 
 
 class output:
