@@ -5,7 +5,7 @@ import multiprocessing as mp
 from argparse import ArgumentParser
 from objectDetection import objectDetection, outputTesting #Remove testing for final script
 from frameImport import *
-from objectTracker import objectTracker
+from objectTracker import objectTracker, direction
 
 
 def main():
@@ -48,6 +48,7 @@ def main():
     min_pixel_distance = frame_width/5 
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
+    dir = direction(max_tracker_age)
     '''
 
     # tracker testing w hardcoded variables
@@ -70,6 +71,7 @@ def main():
     min_tracker_hits = 2 #2 for testing
     min_pixel_distance = frame_width/5 #20% of frame width #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
+    dir = direction(max_tracker_age)
 
     while cv2.waitKey(1):
         if vid == 'realsense': #if args.video_source == 'realsense':# #Current variable name for testing only
@@ -87,8 +89,9 @@ def main():
         tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
 
 
-        #for tf in tracked_fish:
-        #   direction.firstLastCoord(tracked_fish, grabbed)
+
+        for tf in tracked_fish:
+            travel_direction = dir.directionUpdate(tf, 'RR') #Not currently functional but good start, empty [] for tf not being passed in
         #   direction.directionOutput(args.stream_side)
         #   file = jsonUpdate()
         #   if args.video_source == 'realsense':

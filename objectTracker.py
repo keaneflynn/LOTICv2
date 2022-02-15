@@ -1,4 +1,3 @@
-import this
 import cv2
 import numpy as np
 import math #needed for math.hypot (needed for comparing objects between frames)
@@ -144,55 +143,51 @@ class objectTracker:
 
 
 class direction:
-    def firstLastCoord(self, tracked_fish, grabbed):
-        self.xCoord = tracked_fish[3][0]
-        self.detection = len(tracked_fish) > 0  
-        while grabbed:
-            if self.detection:
-                if first_detection: 
-                    self.latest_coord = self.xCoord
-                #else:
-                    #keep most recent result
+    def __init__(self, max_tracker_age):
+        detection_count = 0
+        nonDetection_count = 0
+        self.max_tracker_age = max_tracker_age
 
+    def writeDirection(self, coordinates, camera_stream_side):
+        firstCoord = coordinates[0]
+        lastCoord = coordinates[1]
+        if camera_stream_side == 'RR':
+            if firstCoord > lastCoord:
+                travel_direction = 'upstream'
             else:
-                self.coord_counter = 0
+                travel_direction = 'downstream'
+        if camera_stream_side == 'RL':
+            if firstCoord > lastCoord:
+                travel_direction = 'downstream'
+            else:
+                travel_direction = 'upstream'
+        return travel_direction
+
+    def directionUpdate(self, tracked_fish, camera_stream_side):
+        detected = len(tracked_fish) > 0
+        fishXcoord = tracked_fish[3][0]
+        if detected:
+            detection_count = 0
+            nonDetection_count = 0
+            if detection_count == 1:
+                firstCoord = fishXcoord
+            else:
+                latestCoord = fishXcoord
+        else:
+            nonDetection_count += 1
+            if nonDetection_count > self.max_tracker_age:
+                self.firstLastCoord = [firstCoord, latestCoord]
+                nonDetection_count = 0
+                detection_count = 0
+                if len(self.firstLastCoord) > 0:
+                    travel_direction = writeDirection(self.firstLastCoord, camera_stream_side)
+                    return travel_direction
+                else:
+                    pass
+            else:
                 pass
 
-
-
-        while grabbed:
-            coord_count = 0
-            started = False
-            while grabbed:
-                if started:
-                    if self.detection:
-                        self.latest_coord = self.xCoord
-                    else:
-                        coord_count += 1
-                        if coord_count = 
-
-                            break
-                        else:
-                            pass
-
-                else:
-                    if self.detection:
-                        self.first_coord = self.xCoord
-                        started = True
-                    else:
-                        pass
-
-
-    def directionOutput(self, camera_streamside_position):
-        if camera_streamside_position == 'RR':
-            direction = #sample upstream
-        else:
-            direction = #sample downstream
-        return direction
-
-
 class depthMapping:
-
     def __init__(self):
         self.sensor_width_mm = 3.60
         self.sensor_height_mm = 2.10
