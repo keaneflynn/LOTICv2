@@ -1,3 +1,4 @@
+import this
 import cv2
 import numpy as np
 import math #needed for math.hypot (needed for comparing objects between frames)
@@ -143,12 +144,51 @@ class objectTracker:
 
 
 class direction:
-    def __init__(self, tracked_fish):
+    def firstLastCoord(self, tracked_fish, grabbed):
         self.xCoord = tracked_fish[3][0]
-        self.direction_countID = 0
+        self.detection = len(tracked_fish) > 0  
+        while grabbed:
+            if self.detection:
+                if first_detection: 
+                    self.latest_coord = self.xCoord
+                else:
+                    #keep most recent result
 
-    def firstCoords(self):
-        test
+            else:
+                self.coord_counter = 0
+                pass
+
+
+
+        while grabbed:
+            coord_count = 0
+            started = False
+            while grabbed:
+                if started:
+                    if self.detection:
+                        self.latest_coord = self.xCoord
+                    else:
+                        coord_count += 1
+                        if coord_count = 
+
+                            break
+                        else:
+                            pass
+
+                else:
+                    if self.detection:
+                        self.first_coord = self.xCoord
+                        started = True
+                    else:
+                        pass
+
+
+    def directionOutput(self, camera_streamside_position):
+        if camera_streamside_position == 'RR':
+            direction = #sample upstream
+        else:
+            direction = #sample downstream
+        return direction
 
 
 class depthMapping:
