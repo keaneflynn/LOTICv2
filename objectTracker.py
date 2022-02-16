@@ -125,15 +125,13 @@ class objectTracker:
             self.tracked_objects.append(new_fish)
 
         ret = []
+        evicted = []
 
-        to = []
         # filter out dead tracked items, append ret with passing tracked_objects, and return ret
         for obj in self.tracked_objects:
-            to.append(obj.fish_id) 
-
             if obj.frames_without_hit >= self.max_age:
                 self.tracked_objects.remove(obj)
-                #compute difference between first center object and last one
+                evicted.append(obj)
                 continue
 
             if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
@@ -141,8 +139,8 @@ class objectTracker:
                 ret.append(r)
 
         if len(ret) == 0:
-            return np.empty((0,4)), to
-        return ret, to
+            return np.empty((0,4)), evicted
+        return ret, evicted
 
 
 class direction:

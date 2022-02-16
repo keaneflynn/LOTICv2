@@ -86,7 +86,14 @@ def main():
 
 
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
-        tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
+        tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame)
+
+        for fish in evicted_fish:
+            # iterate over all fish we have aged out and are no longer tracking.
+            # at this point, you can make calculations over the lifetime of the
+            # tracked object, like....
+            moveX = fish.center[0] - fish.first_center[0]
+            moveY = fish.center[1] - fish.first_center[1]
 
         print(ot.tracked_objects)
         #print(len(tracked_fish))
