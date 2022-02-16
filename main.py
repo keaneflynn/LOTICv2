@@ -88,10 +88,12 @@ def main():
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
         tracked_fish, tracklets = ot.update_tracker(classes, scores, boxes, frame)
 
-
-
-        for tf in tracked_fish:
-            travel_direction = dir.directionUpdate(tf, 'RR') #Not currently functional but good start, empty [] for tf not being passed in
+        print(ot.tracked_objects)
+        #print(len(tracked_fish))
+        #for tf in tracked_fish:
+            #print('beanbag')
+            #print(tf)
+        #    travel_direction = dir.directionUpdate(tf, 'RR') #Not currently functional but good start, empty [] for tf not being passed in
         #   direction.directionOutput(args.stream_side)
         #   file = jsonUpdate()
         #   if args.video_source == 'realsense':

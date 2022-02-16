@@ -24,6 +24,8 @@ class Fish:
         self.max_c_frame = frame
         self.hit_streak = 0
         self.frames_without_hit = 0
+        self.first_center = [box[0], box[1]]
+    
 
     def update_fish(self, box, score, frame):
         #updates state of tracked objects
@@ -127,10 +129,11 @@ class objectTracker:
         to = []
         # filter out dead tracked items, append ret with passing tracked_objects, and return ret
         for obj in self.tracked_objects:
-            to.append(obj.fish_id)
+            to.append(obj.fish_id) 
 
             if obj.frames_without_hit >= self.max_age:
                 self.tracked_objects.remove(obj)
+                #compute difference between first center object and last one
                 continue
 
             if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
