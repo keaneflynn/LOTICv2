@@ -64,14 +64,14 @@ def main():
     color_frame = fi.loadFrame()
     fps = color_frame.get(cv2.CAP_PROP_FPS)
     frame_width = color_frame.get(cv2.CAP_PROP_FRAME_WIDTH)
+    camera_stream_side = 'RR'
     od.loadNN()
 
     # below are optimal tracker parameters for fish model and test video
-    max_tracker_age = floor(fps)/1 #where denominator is number of seconds to break tracker for individual #26 for testing#
+    max_tracker_age = floor(fps) * 1 #where integer is number of seconds to break tracker 
     min_tracker_hits = 2 #2 for testing
     min_pixel_distance = frame_width/5 #20% of frame width #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
-    dir = direction(max_tracker_age)
 
     while cv2.waitKey(1):
         if vid == 'realsense': #if args.video_source == 'realsense':# #Current variable name for testing only
@@ -88,14 +88,19 @@ def main():
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
         tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame)
 
-        for fish in evicted_fish:
+
+        travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, frame_width)
+
+
+        #for fish in evicted_fish:
             # iterate over all fish we have aged out and are no longer tracking.
             # at this point, you can make calculations over the lifetime of the
             # tracked object, like....
-            moveX = fish.center[0] - fish.first_center[0]
-            moveY = fish.center[1] - fish.first_center[1]
+            #print(fish)
+            #moveX = fish.center[0] - fish.first_center[0]
+            #moveY = fish.center[1] - fish.first_center[1]
 
-        print(ot.tracked_objects)
+        #print(ot.tracked_objects)
         #print(len(tracked_fish))
         #for tf in tracked_fish:
             #print('beanbag')

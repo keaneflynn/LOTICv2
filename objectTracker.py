@@ -144,49 +144,34 @@ class objectTracker:
 
 
 class direction:
-    def __init__(self, max_tracker_age):
-        detection_count = 0
-        nonDetection_count = 0
-        self.max_tracker_age = max_tracker_age
-
-    def writeDirection(self, coordinates, camera_stream_side):
-        firstCoord = coordinates[0]
-        lastCoord = coordinates[1]
-        if camera_stream_side == 'RR':
-            if firstCoord > lastCoord:
-                travel_direction = 'upstream'
-            else:
-                travel_direction = 'downstream'
-        if camera_stream_side == 'RL':
-            if firstCoord > lastCoord:
-                travel_direction = 'downstream'
-            else:
-                travel_direction = 'upstream'
-        return travel_direction
-
-    def directionUpdate(self, tracked_fish, camera_stream_side):
-        detected = len(tracked_fish) > 0
-        fishXcoord = tracked_fish[3][0]
-        if detected:
-            detection_count = 0
-            nonDetection_count = 0
-            if detection_count == 1:
-                firstCoord = fishXcoord
-            else:
-                latestCoord = fishXcoord
-        else:
-            nonDetection_count += 1
-            if nonDetection_count > self.max_tracker_age:
-                self.firstLastCoord = [firstCoord, latestCoord]
-                nonDetection_count = 0
-                detection_count = 0
-                if len(self.firstLastCoord) > 0:
-                    travel_direction = writeDirection(self.firstLastCoord, camera_stream_side)
-                    return travel_direction
+    #Uses half way marker from video input to identify direction of travel based on first location of evicted fish and last location of evicted fish
+    #4 potential returns are: Downstream movement, Upstream movement, milling: US to US, milling: DS to DS
+    #Could potentiall use difference between first and last detection location, however that might create an issue depending upon detection locations
+    #There is potential here to improve the algorithm depending upon tracker and neural network efficacy
+    def directionOutput(evicted_fish, camera_stream_side, frame_width):
+        for fish in evicted_fish:
+            if camera_stream_side == 'RR':
+                if fish.first_center[0] < frame_width/2 and fish.center[0] >= frame_width/2:
+                    travel_direction = 'downstream'
+                elif fish.first_center[0] > frame_width/2 and fish.center[0] <= frame_width/2: 
+                    travel_direction = 'upstream'
+                elif fish.first_center[0] < frame_width/2 and fish.center[0] <= frame_width/2:
+                    travel_direction = 'mill: remained upstream'
                 else:
-                    pass
-            else:
-                pass
+                    travel_direction = "mill: remained downstream"
+
+            else: #camera_stream_side == 'RL'
+                if fish.first_center[0] < frame_width/2 and fish.center[0] >= frame_width/2:
+                    travel_direction = 'upstream'
+                elif fish.first_center[0] > frame_width/2 and fish.center[0] <= frame_width/2: 
+                    travel_direction = 'downstream'
+                elif fish.first_center[0] < frame_width/2 and fish.center[0] <= frame_width/2:
+                    travel_direction = 'mill: remained downstream'
+                else:
+                    travel_direction = 'mill: remained upstream'
+
+            return travel_direction
+
 
 class depthMapping:
     def __init__(self):
