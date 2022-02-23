@@ -131,6 +131,8 @@ class objectTracker:
         for obj in self.tracked_objects:
             if obj.frames_without_hit >= self.max_age:
                 self.tracked_objects.remove(obj)
+                #e = [obj.fish_id, obj.first_center, obj.center]
+                #evicted.append(e)
                 evicted.append(obj)
                 continue
 
@@ -158,7 +160,7 @@ class direction:
                 elif fish.first_center[0] < frame_width/2 and fish.center[0] <= frame_width/2:
                     travel_direction = 'mill: remained upstream'
                 else:
-                    travel_direction = "mill: remained downstream"
+                    travel_direction = 'mill: remained downstream'
 
             else: #camera_stream_side == 'RL'
                 if fish.first_center[0] < frame_width/2 and fish.center[0] >= frame_width/2:

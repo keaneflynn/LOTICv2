@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from objectDetection import objectDetection, outputTesting #Remove testing for final script
 from frameImport import *
 from objectTracker import objectTracker, direction
+from output import jsonOut
 
 
 def main():
@@ -30,12 +31,16 @@ def main():
     if args.video_source == 'realsense':
         from realsense import realsense
         from objectTracker import depthMapping
+        from output import jsonOut_rs
+        jo = jsonOut_rs()
         dm = depthMapping()
         rs = realsense()
         fps = rs.getFPS()
         frame_width = rs.getFrameWidth()
 
     else:
+        from output import jsonOut
+        jo = jsonOut()
         fi = frameImport(args.video_source) #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.loadFrame() #frame source
         fps = color_frame.get(cv2.CAP_PROP_FPS) #To be used to determine detection loop breaks 
@@ -61,6 +66,7 @@ def main():
 
     od = objectDetection(confidence, weights, config, name)
     fi = frameImport(vid)
+    jo = jsonOut()
     color_frame = fi.loadFrame()
     fps = color_frame.get(cv2.CAP_PROP_FPS)
     frame_width = color_frame.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -68,7 +74,7 @@ def main():
     od.loadNN()
 
     # below are optimal tracker parameters for fish model and test video
-    max_tracker_age = floor(fps) * 1 #where integer is number of seconds to break tracker 
+    max_tracker_age = floor(fps) * 0.5 #where integer is number of seconds to break tracker 
     min_tracker_hits = 2 #2 for testing
     min_pixel_distance = frame_width/5 #20% of frame width #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
@@ -88,18 +94,11 @@ def main():
         # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
         tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame)
 
-
+    
         travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, frame_width)
 
-
-        #for fish in evicted_fish:
-            # iterate over all fish we have aged out and are no longer tracking.
-            # at this point, you can make calculations over the lifetime of the
-            # tracked object, like....
-            #print(fish)
-            #moveX = fish.center[0] - fish.first_center[0]
-            #moveY = fish.center[1] - fish.first_center[1]
-
+        for fish in evicted_fish:
+            print(travel_direction)
         #print(ot.tracked_objects)
         #print(len(tracked_fish))
         #for tf in tracked_fish:

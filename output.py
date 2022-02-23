@@ -1,27 +1,30 @@
 import json
 import numpy as np
-import time
+import datetime as datetime
 
 class jsonOut:
-	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
-		self.dateTime = 
+	def __init__(self, sitename, names_file):
 		self.site = sitename
-		self.species = 
-		self.confidence =
-		self.travelDirection = 
+		self.class_names = []
+		with open(names_file, "r") as f:
+			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def jsonOutputUpdate(self):
+	def writeFile(self, evicted_fish, travel_direction):
+		for fish in evicted_fish:
+			json_data = [datetime.datetime.utcnow(), 
+		  				 self.site, 
+		  				 self.class_names[fish.fish_id], 
+		  				 fish.max_confidence,
+		  				 travel_direction]
 
-
-	def writeFile(self):
 		directory = 'outfile'
 		filename = 
 		json_file = {
-			"dateTime":,
-			"site":,
-			"species":,
-			"maxConfidence": np.float64(),
-			"travelDirection":
+			"dateTime":json_data[0],
+			"site":json_data[1],
+			"species":json_data[2],
+			"maxConfidence": np.float64(json_data[3]),
+			"travelDirection": json_data[4]
 		}
 
 		with open("{}/{}.json".format(directory, filename), 'w') as f:
