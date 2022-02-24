@@ -10,6 +10,29 @@ class Detection:
         self.center = [box[0], box[1]]
 
 
+
+def check_species(detected_species, score, species_dict):
+    # species_dict = {class_id: [hits, average confidence]}
+
+    if detected_species in species_dict.keys():
+        hits = species_dict.get(detected_species)[0] + 1
+        avg_conf = (species_dict.get(detected_species)[1] * (hits - 1) + score)/hits
+        species_dict[detected_species] = [hits, avg_conf]
+    else:
+        species_dict[detected_species] = [1, score]
+
+    if len(species_dict) == 1:
+        return detected_species
+    else:
+        max = 0
+        species = None
+        for k, v in species_dict:
+            if v[1] > max:
+                species = k
+                max = v[1]
+    return species
+
+
 class Fish:
     id_count = 0
 
@@ -17,6 +40,7 @@ class Fish:
         self.fish_id = Fish.id_count
         Fish.id_count += 1
         self.class_id = class_id
+        self.hits_dict = {}
         self.box = box
         self.center = [box[0], box[1]]
         self.max_confidence = score
@@ -27,12 +51,13 @@ class Fish:
         self.first_center = [box[0], box[1]]
     
 
-    def update_fish(self, box, score, frame):
+    def update_fish(self, box, score, frame, class_id):
         #updates state of tracked objects
         self.hit_streak += 1
         self.box = box
         self.center = [box[0], box[1]]
         self.frames_without_hit = 0
+        self.class_id = check_species(class_id, score, self.hits_dict)
         if score > self.max_confidence:
             self.max_confidence = score
             self.max_c_frame = frame
@@ -117,7 +142,8 @@ class objectTracker:
         for m in matches:
             b = dets[m[1]].box
             s = dets[m[1]].score
-            self.tracked_objects[m[0]].update_fish(b, s, frame)
+            c = dets[m[1]].class_id
+            self.tracked_objects[m[0]].update_fish(b, s, frame, c)
 
         # initialize new fish for unmatched detections and append to tracked_objects
         for u in umd:
