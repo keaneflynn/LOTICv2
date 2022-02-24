@@ -148,7 +148,7 @@ class objectTracker:
 class direction:
     #Uses half way marker from video input to identify direction of travel based on first location of evicted fish and last location of evicted fish
     #4 potential returns are: Downstream movement, Upstream movement, milling: US to US, milling: DS to DS
-    #Could potentiall use difference between first and last detection location, however that might create an issue depending upon detection locations
+    #Could potentially use difference between first and last detection location, however that might create an issue depending upon detection locations
     #There is potential here to improve the algorithm depending upon tracker and neural network efficacy
     def directionOutput(evicted_fish, camera_stream_side, frame_width):
         for fish in evicted_fish:

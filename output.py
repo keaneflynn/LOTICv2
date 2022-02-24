@@ -9,28 +9,29 @@ class jsonOut:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile(self, evicted_fish, travel_direction):
+	def writeFile(self, evicted_fish, travel_direction, output_directory):
 		for fish in evicted_fish:
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
-		  				 self.class_names[fish.fish_id], 
+		  				 self.class_names[fish.class_id[0]], 
 		  				 fish.max_confidence,
-		  				 travel_direction]
+		  				 travel_direction,
+						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")]
 
-		directory = 'outfile'
-		filename = 
-		json_file = {
-			"dateTime":json_data[0],
-			"site":json_data[1],
-			"species":json_data[2],
-			"maxConfidence": np.float64(json_data[3]),
-			"travelDirection": json_data[4]
-		}
+			directory = output_directory
+			filename = json_data[2]+'_'+json_data[5]
+			print(directory+filename)
+			json_file = {
+				"dateTime":str(json_data[0]),
+				"site":json_data[1],
+				"species":json_data[2],
+				"maxConfidence": np.float64(json_data[3]),
+				"travelDirection": json_data[4]
+				}	
+			with open("{}/{}.json".format(directory, filename), 'w') as f:
+				json.dump(json_file, f)
 
-		with open("{}/{}.json".format(directory, filename), 'w') as f:
-            json.dump(json_out, f)
-
-
+'''
 class jsonOut_rs:
 	def __init__(self, sitename, INPUTS_FROM_TRACKER_HERE):
 		self.dateTime = 
@@ -101,4 +102,4 @@ class output:
 						
 					else: #Condition: Any video frame imported with no fish detection
 						pass 
-                        
+'''                     

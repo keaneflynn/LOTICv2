@@ -63,14 +63,16 @@ def main():
     config = "models/yolov4-tiny-fish.cfg"
     name = "models/yolov4-tiny-fish.names"
     vid = "media/coho-steelhead-test-short.mov"
+    camera_stream_side = 'RR'
+    sitename = 'testSite'
+    output_directory = './outfile/'
 
     od = objectDetection(confidence, weights, config, name)
     fi = frameImport(vid)
-    jo = jsonOut()
+    jo = jsonOut(sitename, name)
     color_frame = fi.loadFrame()
     fps = color_frame.get(cv2.CAP_PROP_FPS)
     frame_width = color_frame.get(cv2.CAP_PROP_FRAME_WIDTH)
-    camera_stream_side = 'RR'
     od.loadNN()
 
     # below are optimal tracker parameters for fish model and test video
@@ -97,18 +99,8 @@ def main():
     
         travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, frame_width)
 
-        for fish in evicted_fish:
-            print(travel_direction)
-        #print(ot.tracked_objects)
-        #print(len(tracked_fish))
-        #for tf in tracked_fish:
-            #print('beanbag')
-            #print(tf)
-        #    travel_direction = dir.directionUpdate(tf, 'RR') #Not currently functional but good start, empty [] for tf not being passed in
-        #   direction.directionOutput(args.stream_side)
-        #   file = jsonUpdate()
-        #   if args.video_source == 'realsense':
-        #       fork_length = updateAverageLength(depth_frame, tracked_fish)
+
+        jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output 
 
         ''' 
         test stuff
