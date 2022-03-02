@@ -20,6 +20,9 @@ class realsense:
     def getFrameWidth(self):
         return self.width
 
+    def getFrameHeight(self):
+        return self.height
+
     def grab_frame(self):
         frame = self.pipeline.wait_for_frames()
         depth_frame = frame.get_depth_frame()
