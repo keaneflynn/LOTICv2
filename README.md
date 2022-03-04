@@ -27,3 +27,6 @@ git checkout main
 git branch -D TemporaryBranchName
 git pull
 ```
+
+## Introduction
+This repository was created to provide an open-source program to be paired with low-cost hardware which can be used in freshwater fisheries monitoring to detect, speciate, and record migratory fish in rivers. Based off of the original LOTIC repository, this program works with YOLO (you only look once) object detection methods (Redmond et al. 2016) combined with a SORT based object tracker to identify individual fish
