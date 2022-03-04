@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from objectDetection import objectDetection, outputTesting #Remove testing for final script
 from frameImport import *
 from objectTracker import objectTracker, direction
-from output import jsonOut#, videoOutput
+from output import jsonOut, videoOutput
 
 
 def main():
@@ -50,6 +50,7 @@ def main():
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
     od.loadNN()
+    vo = videoOutput(args.sitecode, args.exit_threshold, video_info)
 
     max_tracker_age = floor(fps)/1
     min_tracker_hits = 2
@@ -79,7 +80,7 @@ def main():
                   color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
     od.loadNN()
-    #vo = videoOutput(args.exit_threshold)
+    vo = videoOutput(sitename, 10, video_info)
 
     # below are optimal tracker parameters for fish model and test video
     max_tracker_age = floor(video_info[0]) * 3 #where integer is number of seconds to break tracker 
@@ -109,7 +110,7 @@ def main():
         jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output 
 
 
-        #vo.writeVideo(frame, tracked_fish, evicted_fish)
+        vo.writeVideo(tracked_fish, frame)
 
         ''' 
         test stuff
