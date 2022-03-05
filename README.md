@@ -29,4 +29,11 @@ git pull
 ```
 
 ## Introduction
-This repository was created to provide an open-source program to be paired with low-cost hardware which can be used in freshwater fisheries monitoring to detect, speciate, and record migratory fish in rivers. Based off of the original LOTIC repository, this program works with YOLO (you only look once) object detection methods (Redmond et al. 2016) combined with a SORT based object tracker to identify individual fish
+This repository was created and designed by Keane Flynn, Ryan Flynn, Jack Rogers, and Gabriel Rossi to provide an open-source program to be paired with low-cost hardware which can be used in freshwater fisheries monitoring to detect, speciate, and record migratory fish in rivers. Based off of the [original LOTIC repository](https://github.com/keaneflynn/LOTIC), this program works with YOLO (you only look once) object detection methods (Redmond et al. 2016) combined with a SORT based object tracker to identify individual fish over the duration of a video in which they are detected. This program was designed as an alternative to downstream/upstream migrant trapping to alleviate stress on fishes and reduce the amount of fieldwork required to collect necessary data for monitoring programs. This is **not** intended to replace people, there are plenty of situations where human effort will outperform this program (i.e. turbid conditions). 
+
+![Detection of juvenile coho salmon in Woods Creek](https://github.com/keaneflynn/LOTICv2/blob/main/media/cohoGif.gif)
+
+## Necessary Hardware
+- Nvidia Jetson Xavier NX (has not been tested, but should probably work on an AGX if you can get one)
+- External camera (will work with any camera source, but designed around an IP camera and Intel Realsense Camera)
+- Power source (can be powered from stock jetson power supply or from solar -> 19v supply for standalone unit)
