@@ -80,7 +80,7 @@ def main():
                   color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
     od.loadNN()
-    vo = videoOutput(sitename, 10, video_info)
+    vo = videoOutput(sitename, 2, video_info)
 
     # below are optimal tracker parameters for fish model and test video
     max_tracker_age = floor(video_info[0]) * 3 #where integer is number of seconds to break tracker 
@@ -109,7 +109,7 @@ def main():
 
         jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output 
 
-
+    
         vo.writeVideo(tracked_fish, frame)
 
         ''' 

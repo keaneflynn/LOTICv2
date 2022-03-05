@@ -67,25 +67,35 @@ class jsonOut_rs:
 class videoOutput:
 	def __init__(self, sitename, exit_threshold, video_info):
 		self.exit_threshold = int(exit_threshold * video_info[0])
-		self.fourcc = cv2.VideoWriter_fourcc(*'MPEG')
+		self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 		self.fps = video_info[0]
 		self.frame_width = int(video_info[1])
 		self.frame_height = int(video_info[2])
 		self.counter = 0
 		self.sitename = sitename
+		self.outfile_id = 0
+		
+		time = datetime.datetime.now().strftime("%m-%d-%Y")
+		outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+		self.outfile = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
 	def writeVideo(self, tracked_fish, frame):
-		#time = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-		time = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M")
-		outfile_name = 'outfile/'+self.sitename+'_'+time+'.avi'
-		output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 		if len(tracked_fish) > 0:
-			output.write(frame)
+			self.output.write(frame)
 			self.counter = 1
 		else:
-			if self.counter in range(1,self.exit_threshold):
-				output.write(frame)
-				self.counter += 1
+			if self.counter in range(1,self.exit_threshold+1):
+				self.output.write(frame)
+				self.counter+=1
+			elif self.counter == self.exit_threshold+1:
+				self.counter+=1
+				self.outfile_id+=1
+				time = datetime.datetime.now().strftime("%m-%d-%Y")
+				outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+				self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 			else:
 				self.counter = 0
+				time = datetime.datetime.now().strftime("%m-%d-%Y")
+				outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+				self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
