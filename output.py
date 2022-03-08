@@ -77,7 +77,7 @@ class videoOutput:
 		
 		time = datetime.datetime.now().strftime("%m-%d-%Y")
 		outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
-		self.outfile = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
+		self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
 	def writeVideo(self, tracked_fish, frame):
 		if len(tracked_fish) > 0:
