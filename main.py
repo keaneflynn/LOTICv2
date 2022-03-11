@@ -66,7 +66,7 @@ def main():
     weights = "models/yolov4-tiny-fish.weights"
     config = "models/yolov4-tiny-fish.cfg"
     name = "models/yolov4-tiny-fish.names"
-    vid = "media/coho-steelhead-test.mov"
+    vid = "media/coho-steelhead-test-short.mov"
     camera_stream_side = 'RR'
     sitename = 'testSite'
     output_directory = './outfile/'
@@ -107,7 +107,7 @@ def main():
         travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, video_info[1])
 
 
-        jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output 
+        jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output
 
     
         vo.writeVideo(tracked_fish, frame)
