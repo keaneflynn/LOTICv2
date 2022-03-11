@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-import math #needed for math.hypot (needed for comparing objects between frames)
+import math  # needed for math.hypot (needed for comparing objects between frames)
+
 
 class Detection:
     def __init__(self, class_id, score, box):
@@ -10,6 +11,28 @@ class Detection:
         self.center = [box[0], box[1]]
 
 
+def check_species(detected_species, score, species_dict):
+    # species_dict = {class_id: [hits, average confidence]}
+
+    if detected_species in species_dict.keys():
+        hits = species_dict.get(detected_species)[0] + 1
+        avg_conf = (species_dict.get(detected_species)[1] * (hits - 1) + score) / hits
+        species_dict[detected_species] = [hits, avg_conf]
+    else:
+        species_dict[detected_species] = [1, score]
+
+    if len(species_dict) == 1:
+        return detected_species
+    else:
+        spec_max = 0
+        species = None
+        for k, v in species_dict.items():
+            if v[1] > spec_max:
+                species = k
+                spec_max = v[1]
+    return species
+
+
 class Fish:
     id_count = 0
 
@@ -17,6 +40,7 @@ class Fish:
         self.fish_id = Fish.id_count
         Fish.id_count += 1
         self.class_id = class_id
+        self.hits_dict = {}
         self.box = box
         self.center = [box[0], box[1]]
         self.max_confidence = score
@@ -25,24 +49,24 @@ class Fish:
         self.hit_streak = 0
         self.frames_without_hit = 0
         self.first_center = [box[0], box[1]]
-    
 
-    def update_fish(self, box, score, frame):
-        #updates state of tracked objects
+    def update_fish(self, box, score, frame, class_id):
+        # updates state of tracked objects
         self.hit_streak += 1
         self.box = box
         self.center = [box[0], box[1]]
         self.frames_without_hit = 0
+        self.class_id = check_species(class_id, score, self.hits_dict)
         if score > self.max_confidence:
             self.max_confidence = score
             self.max_c_frame = frame
 
     def predict(self):
-        #checks if hitstreak needs to be reset
-        #updates frames without hit
-        #returns predicted location
+        # checks if hitstreak needs to be reset
+        # updates frames without hit
+        # returns predicted location
         # if self.frames_without_hit > 4:
-         #   self.hit_streak = 0
+        #   self.hit_streak = 0
         self.frames_without_hit += 1
         # return self.center
 
@@ -88,7 +112,6 @@ class objectTracker:
         self.frame_count = 0
         # list of final objects tracked in the form [fish_id, class_id, score, box]
 
-
     def update_tracker(self, classes, scores, boxes, frame):
         self.frame_count += 1
 
@@ -107,7 +130,6 @@ class objectTracker:
             dets.append(det)
             dets_center_points.append(det.center)
 
-
         # association: given predicted_center_points and dets_center_points return matches, a
         # 2d list with shape(n, 2) where each row represents a match, column 0 = index in tracked_objects, and
         # column 1 = index in dets, and unmatched detections a
@@ -117,7 +139,8 @@ class objectTracker:
         for m in matches:
             b = dets[m[1]].box
             s = dets[m[1]].score
-            self.tracked_objects[m[0]].update_fish(b, s, frame)
+            c = dets[m[1]].class_id
+            self.tracked_objects[m[0]].update_fish(b, s, frame, c)
 
         # initialize new fish for unmatched detections and append to tracked_objects
         for u in umd:
@@ -131,8 +154,8 @@ class objectTracker:
         for obj in self.tracked_objects:
             if obj.frames_without_hit >= self.max_age:
                 self.tracked_objects.remove(obj)
-                #e = [obj.fish_id, obj.first_center, obj.center]
-                #evicted.append(e)
+                # e = [obj.fish_id, obj.first_center, obj.center]
+                # evicted.append(e)
                 evicted.append(obj)
                 continue
 
@@ -141,33 +164,33 @@ class objectTracker:
                 ret.append(r)
 
         if len(ret) == 0:
-            return np.empty((0,4)), evicted
+            return np.empty((0, 4)), evicted
         return ret, evicted
 
 
 class direction:
-    #Uses half way marker from video input to identify direction of travel based on first location of evicted fish and last location of evicted fish
-    #4 potential returns are: Downstream movement, Upstream movement, milling: US to US, milling: DS to DS
-    #Could potentially use difference between first and last detection location, however that might create an issue depending upon detection locations
-    #There is potential here to improve the algorithm depending upon tracker and neural network efficacy
+    # Uses half way marker from video input to identify direction of travel based on first location of evicted fish and last location of evicted fish
+    # 4 potential returns are: Downstream movement, Upstream movement, milling: US to US, milling: DS to DS
+    # Could potentially use difference between first and last detection location, however that might create an issue depending upon detection locations
+    # There is potential here to improve the algorithm depending upon tracker and neural network efficacy
     def directionOutput(evicted_fish, camera_stream_side, frame_width):
         for fish in evicted_fish:
             if camera_stream_side == 'RR':
-                if fish.first_center[0] < frame_width/2 and fish.center[0] >= frame_width/2:
+                if fish.first_center[0] < frame_width / 2 and fish.center[0] >= frame_width / 2:
                     travel_direction = 'downstream'
-                elif fish.first_center[0] > frame_width/2 and fish.center[0] <= frame_width/2: 
+                elif fish.first_center[0] > frame_width / 2 and fish.center[0] <= frame_width / 2:
                     travel_direction = 'upstream'
-                elif fish.first_center[0] < frame_width/2 and fish.center[0] <= frame_width/2:
+                elif fish.first_center[0] < frame_width / 2 and fish.center[0] <= frame_width / 2:
                     travel_direction = 'mill: remained upstream'
                 else:
                     travel_direction = 'mill: remained downstream'
 
-            else: #camera_stream_side == 'RL'
-                if fish.first_center[0] < frame_width/2 and fish.center[0] >= frame_width/2:
+            else:  # camera_stream_side == 'RL'
+                if fish.first_center[0] < frame_width / 2 and fish.center[0] >= frame_width / 2:
                     travel_direction = 'upstream'
-                elif fish.first_center[0] > frame_width/2 and fish.center[0] <= frame_width/2: 
+                elif fish.first_center[0] > frame_width / 2 and fish.center[0] <= frame_width / 2:
                     travel_direction = 'downstream'
-                elif fish.first_center[0] < frame_width/2 and fish.center[0] <= frame_width/2:
+                elif fish.first_center[0] < frame_width / 2 and fish.center[0] <= frame_width / 2:
                     travel_direction = 'mill: remained downstream'
                 else:
                     travel_direction = 'mill: remained upstream'
@@ -190,17 +213,19 @@ class depthMapping:
         self.tracked_fish = tracked_fish
         center_points = []
         object_depth = []
-        box_width = [] #figure this out tomorrow
+        box_width = []  # figure this out tomorrow
         for tf in self.tracked_fish:
             center_points = (tf[3][1], tf[3][0])
-            #box_width = #figure this out tomorrow
+            # box_width = #figure this out tomorrow
             object_depth = self.depth_frame[center_points]
-            object_length = self.frameDetection_lengths.append((object_depth[tf] * self.box_width[tf] * self.sensor_width_mm) / (self.focal_length * self.image_width_pixels))
-            
-            #frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]
+            object_length = self.frameDetection_lengths.append(
+                (object_depth[tf] * self.box_width[tf] * self.sensor_width_mm) / (
+                            self.focal_length * self.image_width_pixels))
+
+            # frameDetection_lengths.append = self.depth_frame[self.center[tf[0]]]
         return object_length
 
     def updateAverageLength(self):
         ###Use time to set breakout threshold. If theshold is exceeded then break function###
         self.objectLengths = getLenths()
-        
+
