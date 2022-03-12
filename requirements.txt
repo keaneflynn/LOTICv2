@@ -1,0 +1,11 @@
+package versions:
+
+opencv = 4.5.5
+numpy = 1.22.x
+python > 3.6.x   
+
+
+
+
+
+

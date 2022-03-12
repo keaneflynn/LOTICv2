@@ -14,7 +14,7 @@ class jsonOut:
 		for fish in evicted_fish:
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
-		  				 self.class_names[fish.class_id[0]], 
+		  				 self.class_names[fish.class_id], 
 		  				 fish.max_confidence,
 		  				 travel_direction,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
