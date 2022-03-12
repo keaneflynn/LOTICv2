@@ -1,6 +1,5 @@
 from math import floor
 import cv2
-import multiprocessing as mp
 
 from argparse import ArgumentParser
 from objectDetection import objectDetection, outputTesting #Remove testing for final script
@@ -52,76 +51,64 @@ def main():
     od.loadNN()
     vo = videoOutput(args.sitecode, args.exit_threshold, video_info)
 
-    max_tracker_age = floor(fps)/1
+    max_tracker_age = floor(video_info[0]) * 3 #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     min_tracker_hits = 2
-    min_pixel_distance = frame_width/5 
+    min_pixel_distance = video_info[1]/5
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
-    dir = direction(max_tracker_age)
     '''
 
     # tracker testing w hardcoded variables
 
     confidence = 0.25
-    weights = "models/NorthCoastModelv1.weights"
-    config = "models/NorthCoastModelv1.cfg"
-    name = "models/NorthCoastModel.names"
-    vid = "media/coho-steelhead-test-short.mov"
+    weights = "models/yolov4-tiny-fish.weights"
+    config = "models/yolov4-tiny-fish.cfg"
+    name = "models/yolov4-tiny-fish.names"
+    vid = "media/coho-steelhead-test.mov"
     camera_stream_side = 'RR'
     sitename = 'testSite'
     output_directory = './outfile/'
 
     od = objectDetection(confidence, weights, config, name)
     fi = frameImport(vid)
-    #jo = jsonOut(sitename, name)
+    jo = jsonOut(sitename, name)
     color_frame = fi.loadFrame()
     video_info = [color_frame.get(cv2.CAP_PROP_FPS),
                   color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                   color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
     od.loadNN()
-    #vo = videoOutput(sitename, 2, video_info)
+    vo = videoOutput(sitename, 2, video_info) #middle parameter is number of seconds for video timeout threshold
 
     # below are optimal tracker parameters for fish model and test video
     max_tracker_age = floor(video_info[0]) * 3 #where integer is number of seconds to break tracker 
     min_tracker_hits = 2 #2 for testing
-    min_pixel_distance = video_info[1]/9 #20% of frame width #270 for testing
+    min_pixel_distance = video_info[1]/5 #20% of frame width #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1):
         if vid == 'realsense': #if args.video_source == 'realsense':# #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
-            grabbed, frame = color_frame.read() #add multithreading
+            grabbed, frame = color_frame.read() #Imports frame from video source 
         if not grabbed:
             exit(0)
 
 
-        classes, scores, boxes = od.detection(frame)
+        classes, scores, boxes = od.detection(frame) #performs object detection on individual frame from method in cv2 library
+        
 
-
-        # tracked_fish = 2d list shape(n, 4) of tracked objects in the format [fish_id, class, score, box]
-        tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame)
+        tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames 
         
     
-        travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, video_info[1])
+        travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
 
 
-        #jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output
+        jo.writeFile(evicted_fish, travel_direction, output_directory) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
 
-    
-        #vo.writeVideo(tracked_fish, frame)
+        
+        vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
 
-        ''' 
-        test stuff
-        tf = []
-        for i in tracked_fish:
-            tf.append(i[0])
-
-        print(tf)
-        print(tracklets)
-        print("/n")    
-        '''
 
         oTest = outputTesting(name) #remove for actual script
         oTest.testOutputFrames2(frame, tracked_fish) #remove for actual script
