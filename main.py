@@ -63,29 +63,29 @@ def main():
     # tracker testing w hardcoded variables
 
     confidence = 0.25
-    weights = "models/yolov4-tiny-fish.weights"
-    config = "models/yolov4-tiny-fish.cfg"
-    name = "models/yolov4-tiny-fish.names"
-    vid = "media/coho-steelhead-test.mov"
+    weights = "models/NorthCoastModelv1.weights"
+    config = "models/NorthCoastModelv1.cfg"
+    name = "models/NorthCoastModel.names"
+    vid = "media/coho-steelhead-test-short.mov"
     camera_stream_side = 'RR'
     sitename = 'testSite'
     output_directory = './outfile/'
 
     od = objectDetection(confidence, weights, config, name)
     fi = frameImport(vid)
-    jo = jsonOut(sitename, name)
+    #jo = jsonOut(sitename, name)
     color_frame = fi.loadFrame()
     video_info = [color_frame.get(cv2.CAP_PROP_FPS),
                   color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                   color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
     od.loadNN()
-    vo = videoOutput(sitename, 2, video_info)
+    #vo = videoOutput(sitename, 2, video_info)
 
     # below are optimal tracker parameters for fish model and test video
     max_tracker_age = floor(video_info[0]) * 3 #where integer is number of seconds to break tracker 
     min_tracker_hits = 2 #2 for testing
-    min_pixel_distance = video_info[1]/5 #20% of frame width #270 for testing
+    min_pixel_distance = video_info[1]/9 #20% of frame width #270 for testing
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1):
@@ -107,10 +107,10 @@ def main():
         travel_direction = direction.directionOutput(evicted_fish, camera_stream_side, video_info[1])
 
 
-        jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output 
+        #jo.writeFile(evicted_fish, travel_direction, output_directory) #comment out to stop json output
 
     
-        vo.writeVideo(tracked_fish, frame)
+        #vo.writeVideo(tracked_fish, frame)
 
         ''' 
         test stuff
