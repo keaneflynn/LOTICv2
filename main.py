@@ -61,7 +61,7 @@ def main():
         else:
             grabbed, frame = color_frame.read() #Imports frame from video source 
         if not grabbed:
-            exit(1) #Wo
+            exit(1) #Would pass or return be better here? 
 
 
         classes, scores, boxes = od.detection(frame) #performs object detection on individual frame from method in cv2 library
@@ -79,8 +79,8 @@ def main():
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
 
 
-        #oTest = outputTesting(args.names_file) #remove for actual script
-        #oTest.testOutputFrames2(frame, tracked_fish) #remove for actual script
+        oTest = outputTesting(args.names_file) #remove for actual script
+        oTest.testOutputFrames2(frame, tracked_fish) #remove for actual script
 
 
 if __name__ == '__main__':
