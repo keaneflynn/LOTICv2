@@ -51,5 +51,5 @@ To run the python program (command will be embedded in the service file for cont
 An example of what this string of commands looks like would be as follows:
 ``` 
 python3 main.py ./media/coho-steelhead-test.mov ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.25 2 ./outfile/ 
-'''
+```
 
