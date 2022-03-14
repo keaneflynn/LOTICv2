@@ -1,12 +1,12 @@
-##Place file in the following destination: /lib/systemd/system/ ###
+##Place file in the following destination: /etc/systemd/system/ ###
 
 [Unit]
-Description=LOTIC
+Description=LOTIC machine learning program for migratory fish detection
 After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 ##Add python exectution here###
+ExecStart=/usr/bin/python3 /home/nvidia/LOTICv2/main.py ###ADD POSITIONAL ARGUMENTS HERE###
 WorkingDirectory=/home/nvidia/LOTICv2
 StandardOutput=file:/home/nvidia/main_output.log
 StandardError=file:/home/nvidia/error_file.log
