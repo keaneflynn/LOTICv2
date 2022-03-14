@@ -41,4 +41,12 @@ This repository was created and designed by Keane Flynn, Ryan Flynn, Jack Rogers
 - Power source (can be powered from stock jetson power supply or from solar -> 19v supply for standalone unit)
 - Additional storage for output videos (Nvidia Jetson Xavier's can be outfitted with M.2 SSDs for fast write speeds)
 - Weir environment to channel migrating fishes (not necessary, but a sterile environment will improve detection efficiency)
-- 
+
+## Setting Up on the Nvidia
+To allow for this program to run on startup, place the service file in /etc/systemd/system/. Then issue the following command: ``` sudo systemctl enable lotic ``` to enable the service file to work on startup, and if the service file is modified in any way you must issue the following command ``` sudo systemctl daemon-reload ```. Finally to start it before leaving the computer unattended, issue the following command: ``` sudo systemctl restart lotic ```. 
+This series of commands will allow the service file to operate on startup and restart itself if the computer or program shuts down unexpectedly (i.e. power loss, camera input crash, etc.). 
+
+## Python program
+To run the python program (command will be embedded in the service file for continuous operation), issue the following command to view positional (required) arguments for program to run ``` python main.py -h ```
+An example of what this string of commands looks like would be as follows:
+``` python3 main.py ./media/coho-steelhead-test.mov ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.25 2 ./outfile/ '''
