@@ -4,13 +4,14 @@ import datetime as datetime
 import cv2
 
 class jsonOut:
-	def __init__(self, sitename, names_file):
+	def __init__(self, sitename, names_file, outfile_directory):
 		self.site = sitename
 		self.class_names = []
+		self.directory = outfile_directory
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile(self, evicted_fish, travel_direction, output_directory):
+	def writeFile(self, evicted_fish, travel_direction):
 		for fish in evicted_fish:
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
@@ -20,7 +21,6 @@ class jsonOut:
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
 						 fish.fish_id]
 
-			directory = output_directory
 			filename = json_data[2]+'-'+str(json_data[6])+'_'+json_data[5]
 			json_file = {
 				"dateTime":str(json_data[0]),
@@ -29,7 +29,7 @@ class jsonOut:
 				"maxConfidence": np.float64(json_data[3]),
 				"travelDirection": json_data[4]
 				}	
-			with open("{}/{}.json".format(directory, filename), 'w') as f:
+			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
 				json.dump(json_file, f)
 
 
@@ -65,7 +65,7 @@ class jsonOut_rs:
 
 
 class videoOutput:
-	def __init__(self, sitename, exit_threshold, video_info):
+	def __init__(self, sitename, exit_threshold, video_info, outfile_directory):
 		self.exit_threshold = int(exit_threshold * video_info[0])
 		self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 		self.fps = video_info[0]
@@ -74,9 +74,10 @@ class videoOutput:
 		self.counter = 0
 		self.sitename = sitename
 		self.outfile_id = 0
+		self.outfile_dir = outfile_directory
 		
 		time = datetime.datetime.now().strftime("%m-%d-%Y")
-		outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+		outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
 		self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
 	def writeVideo(self, tracked_fish, frame):
