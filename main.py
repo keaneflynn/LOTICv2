@@ -38,14 +38,14 @@ def main():
 
     else:
         from output import jsonOut
-        jo = jsonOut(args.site_code, args.names_file)
+        jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
         fi = frameImport(args.video_source) #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.loadFrame() #frame source
         video_info = [color_frame.get(cv2.CAP_PROP_FPS),
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
-    vo = videoOutput(args.site_code, args.video_exit_threshold, video_info)
+    vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
 
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
@@ -73,7 +73,7 @@ def main():
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
 
 
-        jo.writeFile(evicted_fish, travel_direction, args.output_file_directory) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+        jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
 
         
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
