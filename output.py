@@ -92,11 +92,11 @@ class videoOutput:
 				self.counter+=1
 				self.outfile_id+=1
 				time = datetime.datetime.now().strftime("%m-%d-%Y")
-				outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+				outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
 				self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 			else:
 				self.counter = 0
 				time = datetime.datetime.now().strftime("%m-%d-%Y")
-				outfile_name = 'outfile/'+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+				outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
 				self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
