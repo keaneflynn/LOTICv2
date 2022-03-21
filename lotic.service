@@ -6,10 +6,10 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/nvidia/LOTICv2/main.py ###ADD POSITIONAL ARGUMENTS HERE###
+ExecStart=/usr/bin/python3 /home/nvidia/LOTICv2/main.py ./media/coho-steelhead-test.mov ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.25 2 ./outfile/ 
 WorkingDirectory=/home/nvidia/LOTICv2
-StandardOutput=file:/home/nvidia/main_output.log
-StandardError=file:/home/nvidia/error_file.log
+StandardOutput=file:/home/nvidia/LOTICv2/errorLogs/main_output.log
+StandardError=file:/home/nvidia/LOTICv2/errorLogs/error_file.log
 Restart=always
 RestartSec=120
 User=nvidia

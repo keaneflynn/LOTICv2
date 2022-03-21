@@ -43,8 +43,10 @@ This repository was created and designed by Keane Flynn, Ryan Flynn, Jack Rogers
 - Weir environment to channel migrating fishes (not necessary, but a sterile environment will improve detection efficiency)
 
 ## Setting Up on the Nvidia
-To allow for this program to run on startup, place the service file in /etc/systemd/system/. Then issue the following command: ``` sudo systemctl enable lotic ``` to enable the service file to work on startup, and if the service file is modified in any way you must issue the following command ``` sudo systemctl daemon-reload ```. Finally to start it before leaving the computer unattended, issue the following command: ``` sudo systemctl restart lotic ```. 
+To allow for this program to run on startup, place the [service file](https://github.com/keaneflynn/LOTICv2/blob/main/lotic.service) in /etc/systemd/system/. Then issue the following command: ``` sudo systemctl enable lotic ``` to enable the service file to work on startup, and if the service file is modified in any way you must issue the following command ``` sudo systemctl daemon-reload ```. Finally, to start it before leaving the computer unattended, issue the following command: ``` sudo systemctl restart lotic ```. 
 This series of commands will allow the service file to operate on startup and restart itself if the computer or program shuts down unexpectedly (i.e. power loss, camera input crash, etc.). 
+To check to make sure the program is up and running while logged into the Jetson, issue the following command: ``` systemctl status lotic.service ```.
+Any errors with the program will be output to an error log file which by default is located in the *errorLogs* directory, but the location can be adjusted in the lotic.service file.
 
 ## Python program
 To run the python program (command will be embedded in the service file for continuous operation), issue the following command to view positional (required) arguments for program to run ``` python main.py -h ```
@@ -52,4 +54,15 @@ An example of what this string of commands looks like would be as follows:
 ``` 
 python3 main.py ./media/coho-steelhead-test.mov ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.25 2 ./outfile/ 
 ```
+
+## Upcoming fixes
+The current repository is functional but it is very much a beta with upcoming updates:
+- Multithreading the video input: this will allow for reduced latency on the main detection loop and improve IP camera functionality
+- Adding an option to draw bounding boxes on output videos: this will be better for demonstration purposes, not adding these will allow the output videos to be used to inform future neural network training for model tweaks.
+- Adding a video frame queue for the video output: this will allow for the video output to contain a few frames before the first fish detection. This can be helpful in less than optimal conditions to have more frames containing fish. If using this, make sure to check for ram usage under load, can potentially throttle the program or result in a segmentation fault if the queue is too large.
+
+## Acknowledgements
+There are so many people to thank for this program coming to fruition. First and foremost, my older brother Ryan has given me most of my coding knowledge and has directly helped on both the original LOTIC repository as well as this one and none of this could have been done without him. Secondly, the research group from UC Berkeley, namely Dr. Gabriel "the fundraiser" Rossi, who has helped with every step of this project including but now limited to: funding, landowner access, collaboration across multiple agencies, moral support, & a bunch of other stuff. Jack Rogers, who has been a tremendous help in integrating the object tracking component into LOTICv2 in a very timely manner despite being a few timezones away and having to decipher my half-ass python skills. My last thank you in terms of individual people goes out to my boy Florida-Man Pete who works at Nvidia and has provided a lot of very useful insight in hardware recommendations and software suggestions to get the ball rolling on this project.
+
+I would also like to thank CalTrout for funding my time working on this project so that it may be used by any agency needing to monitor migratory fish remotely, the north coast division led by Darren Mierau has been incredibly helpful and inspiring in promoting advancements in fisheries technology. The Grantham and Carlson Labs from UC Berkeley were integral in funding the first iteration of LOTIC and it would have never gotten to where it is without their support. I would like to thank the Aquatic Ecosystems Analysis lab at UNR for assisting in my research on this topic and allowing me to pursue it for the second chapter of my master's thesis. Lastly, I would like to thank the Summit Lake Paiute Tribe for allowing me to launch the test version of this system on their reservation and assisting with its integration to monitor the threatened Lahontan cutthroat trout population.
 
