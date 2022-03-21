@@ -41,7 +41,7 @@ def main():
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
         fi = frameImport(args.video_source) #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.loadFrame() #frame source
-        video_info = [color_frame.get(cv2.CAP_PROP_FPS),
+        video_info = [color_frame.get(cv2.CAP_PROP_FPS), #for use with IP cameras, it may be necessary to hardcode in your FPS since OpenCV has issues decyphering this value
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
@@ -56,7 +56,7 @@ def main():
 
 
     while cv2.waitKey(1):
-        if args.video_source == 'realsense':# #Current variable name for testing only
+        if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
             grabbed, frame = color_frame.read() #Imports frame from video source 

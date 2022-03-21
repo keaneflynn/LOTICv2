@@ -153,13 +153,12 @@ class objectTracker:
         # filter out dead tracked items, append ret with passing tracked_objects, and return ret
         for obj in self.tracked_objects:
             if obj.frames_without_hit >= self.max_age:
-                self.tracked_objects.remove(obj)
-                # e = [obj.fish_id, obj.first_center, obj.center]
-                # evicted.append(e)
-                evicted.append(obj)
-                continue
+                self.tracked_objects.remove(obj) # removes individuals who timeout the object tracker criteria
 
-            if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
+            if (obj.hit_streak >= self.min_hits) and (obj.frames_without_hit >= self.max_age): # expels information on individuals no longer being considered in tracking algorithm
+                evicted.append(obj)
+
+            if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits): # main return for currently tracked individuals
                 r = [obj.fish_id, obj.class_id, obj.max_confidence, obj.box]
                 ret.append(r)
 
