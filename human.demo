@@ -1,3 +1,0 @@
-#!/bin/bash
-
-python3 main.py 0 ./models/yolov4-tiny.weights ./models/yolov4-tiny.cfg ./models/coco.names TestSite RR 0.5 3 ./outfile/

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-python3 main.py 0 ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.98 2 ./outfile/ #add positional arguments here

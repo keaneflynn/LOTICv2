@@ -81,8 +81,8 @@ class videoOutput:
 		self.sitename = sitename
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
-		self.buffer_size = 10
-		self.video_buffer = queue.Queue(self.buffer_size) #gives you 10 frames before the fish shows up after the first detection
+		self.buffer_size = 30
+		self.video_buffer = queue.Queue(self.buffer_size) #gives you 20 frames before the fish shows up after the first detection
 		
 		time = datetime.datetime.now().strftime("%m-%d-%Y")
 		outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
@@ -90,14 +90,14 @@ class videoOutput:
 
 	def writeVideo(self, tracked_fish, frame):
 		self.video_buffer.put(frame)
-		if self.video_buffer.qsize() == 10:
-			lag_frame = self.video_buffer.get() #as this buffer is setp now, it takes 10 frames from the end of the video
-												#so take that into account for now w/exit threshold
+		if self.video_buffer.qsize() == self.buffer_size:
+			lag_frame = self.video_buffer.get() 
+
 			if len(tracked_fish) > 0:
 				self.output.write(lag_frame)
 				self.counter = 1
 			else:
-				if self.counter in range(1,self.exit_threshold+self.buffer_size+1): #add buffer size to exit threshold
+				if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): #add buffer size to exit threshold
 					self.output.write(lag_frame)
 					self.counter+=1
 				elif self.counter == self.exit_threshold+self.buffer_size+1:
