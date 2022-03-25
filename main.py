@@ -50,7 +50,7 @@ def main():
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
     min_tracker_hits = 2 #needs 2 detections to initialize tracker for an individual
-    min_pixel_distance = video_info[1]/4 #after traveling %25 of the width of the screen in pixels, the tracker will evict the tracked individual
+    min_pixel_distance = video_info[1]/3 #after traveling %25 of the width of the screen in pixels, the tracker will evict the tracked individual
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
@@ -80,7 +80,7 @@ def main():
 
 
         oTest = outputTesting(args.names_file) #remove for actual script
-        oTest.testOutputFrames2(frame, tracked_fish) #remove for actual script
+        oTest.testOutputFrames(frame, tracked_fish) #remove for actual script
 
 
 if __name__ == '__main__':

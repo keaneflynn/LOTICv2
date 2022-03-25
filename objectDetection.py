@@ -41,15 +41,7 @@ class outputTesting:
         with open(names_file, 'r') as f:
             self.class_names = [cname.strip() for cname in f.readlines()]
 
-    def testOutputFrames(self, frame, classes, scores, boxes):
-        for (class_id, confidence, bounding_box) in zip(classes, scores, boxes):
-            label = "%s" % (self.class_names[class_id[0]])
-            cv2.rectangle(frame, bounding_box, self.color, 2)
-            cv2.putText(frame, label, (bounding_box[0], bounding_box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.color, 2)
-    
-        cv2.imshow("detections", frame)
-
-    def testOutputFrames2(self, frame, tracked_fish): # version compatible with tracker output
+    def testOutputFrames(self, frame, tracked_fish): # version compatible with tracker output
         # fish_id, class , score, box
 
         for t in tracked_fish:
