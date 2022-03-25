@@ -79,8 +79,8 @@ def main():
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
 
 
-        #oTest = outputTesting(args.names_file) #remove for actual script
-        #oTest.testOutputFrames(frame, tracked_fish) #remove for actual script
+        oTest = outputTesting(args.names_file) #remove for actual script
+        oTest.testOutputFrames(frame, tracked_fish) #remove for actual script
 
 
 if __name__ == '__main__':

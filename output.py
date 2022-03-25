@@ -81,7 +81,7 @@ class videoOutput:
 		self.sitename = sitename
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
-		self.buffer_size = 30
+		self.buffer_size = 60
 		self.video_buffer = queue.Queue(self.buffer_size) #gives you 20 frames before the fish shows up after the first detection
 		
 		time = datetime.datetime.now().strftime("%m-%d-%Y")
