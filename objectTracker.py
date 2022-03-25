@@ -175,21 +175,21 @@ class direction:
     def directionOutput(evicted_fish, camera_stream_side, frame_width):
         for fish in evicted_fish:
             if camera_stream_side == 'RR':
-                if fish.first_center[0] < frame_width / 2 and fish.center[0] >= frame_width / 2:
+                if (fish.first_center[0] < frame_width / 2) and (fish.center[0] >= frame_width / 2):
                     travel_direction = 'downstream'
-                elif fish.first_center[0] > frame_width / 2 and fish.center[0] <= frame_width / 2:
+                elif (fish.first_center[0] > frame_width / 2) and (fish.center[0] <= frame_width / 2):
                     travel_direction = 'upstream'
-                elif fish.first_center[0] < frame_width / 2 and fish.center[0] <= frame_width / 2:
+                elif (fish.first_center[0] < frame_width / 2) and (fish.center[0] <= frame_width / 2):
                     travel_direction = 'mill: remained upstream'
                 else:
                     travel_direction = 'mill: remained downstream'
 
             else:  # camera_stream_side == 'RL'
-                if fish.first_center[0] < frame_width / 2 and fish.center[0] >= frame_width / 2:
+                if (fish.first_center[0] < frame_width / 2) and (fish.center[0] >= frame_width / 2):
                     travel_direction = 'upstream'
-                elif fish.first_center[0] > frame_width / 2 and fish.center[0] <= frame_width / 2:
+                elif (fish.first_center[0] > frame_width / 2) and (fish.center[0] <= frame_width / 2):
                     travel_direction = 'downstream'
-                elif fish.first_center[0] < frame_width / 2 and fish.center[0] <= frame_width / 2:
+                elif (fish.first_center[0] < frame_width / 2) and (fish.center[0] <= frame_width / 2):
                     travel_direction = 'mill: remained downstream'
                 else:
                     travel_direction = 'mill: remained upstream'
