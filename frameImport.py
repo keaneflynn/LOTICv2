@@ -10,8 +10,8 @@ class frameImport:
         self.video_source = cv2.VideoCapture(self.video_input)
         return self.video_source
 
-    def receiveFrame(self):
-        while True:
+    def receiveFrame(self, keep_running):
+        while keep_running:
             grabbed, self.frame = self.video_source.read()
             self.frame_input_queue.put(self.frame)
 

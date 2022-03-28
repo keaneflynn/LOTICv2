@@ -1,4 +1,5 @@
 from math import floor
+import signal
 import threading
 from xmlrpc.client import Boolean
 import cv2
@@ -9,6 +10,11 @@ from frameImport import *
 from objectTracker import objectTracker, direction
 from output import videoOutput
 
+keep_running = True
+
+def killAll(signal_number, frame):
+    keep_running = False # To do, not thread safe
+    print("bing bong")
 
 def main():
     parser = ArgumentParser(description='LOTICv2')
@@ -23,6 +29,8 @@ def main():
     parser.add_argument('output_file_directory', type=str, default='./outfile/', help='json and video file output storage location')
     parser.add_argument('--output_with_bounding_boxes', type=str, default='no', help='enter either yes or no to add bounding boxes to video output')
     args = parser.parse_args()
+
+    signal.signal(signal.SIGINT, killAll)
     
     od = objectDetection(args.nn_confidence_activation,
                          args.weights_file,
@@ -48,7 +56,7 @@ def main():
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
-    t1 = threading.Thread(target=fi.receiveFrame)
+    t1 = threading.Thread(target=fi.receiveFrame, args=(keep_running,))
     t1.start()
 
     vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
@@ -61,7 +69,7 @@ def main():
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
 
-    while cv2.waitKey(1):
+    while keep_running:
         if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
