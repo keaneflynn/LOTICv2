@@ -3,12 +3,16 @@ import numpy as np
 import datetime as datetime
 import cv2
 import queue
+import os
 
 class jsonOut:
 	def __init__(self, sitename, names_file, outfile_directory):
 		self.site = sitename
 		self.class_names = []
 		self.directory = outfile_directory
+
+		os.makedirs(self.directory, exist_ok=True)
+
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
