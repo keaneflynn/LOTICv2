@@ -1,4 +1,5 @@
 from math import floor
+import signal
 import threading
 from xmlrpc.client import Boolean
 import cv2
@@ -8,7 +9,7 @@ from objectDetection import objectDetection, outputTesting #Remove testing for f
 from frameImport import *
 from objectTracker import objectTracker, direction
 from output import videoOutput
-
+from lotic_signal import LoticSignal
 
 def main():
     parser = ArgumentParser(description='LOTICv2')
@@ -23,7 +24,10 @@ def main():
     parser.add_argument('output_file_directory', type=str, default='./outfile/', help='json and video file output storage location')
     parser.add_argument('--output_with_bounding_boxes', type=str, default='no', help='enter either yes or no to add bounding boxes to video output')
     args = parser.parse_args()
-    
+
+    ls = LoticSignal()
+    signal.signal(signal.SIGINT, ls.handler)
+
     od = objectDetection(args.nn_confidence_activation,
                          args.weights_file,
                          args.config_file,
@@ -42,7 +46,7 @@ def main():
     else:
         from output import jsonOut
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
-        fi = frameImport(args.video_source) #takes in args flag for video source and creates pipeline for frame import
+        fi = frameImport(args.video_source, ls) #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.videoSource() #frame source
         video_info = [color_frame.get(cv2.CAP_PROP_FPS), #for use with IP cameras, it may be necessary to hardcode in your FPS since OpenCV has issues decyphering this value
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
@@ -61,11 +65,13 @@ def main():
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
 
-    while cv2.waitKey(1):
+    while ls.keep_running():
         if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
             frame = fi.grabFrame() #Imports frame from video source 
+            if frame is None:
+                break
 
 
         classes, scores, boxes = od.detection(frame) #performs object detection on individual frame from method in cv2 library
@@ -86,6 +92,8 @@ def main():
         if args.output_with_bounding_boxes == 'yes':
             oTest = outputTesting(args.names_file) #remove for actual script
             oTest.testOutputFrames(frame, tracked_fish) #remove for actual script
+
+    t1.join()
 
 
 if __name__ == '__main__':
