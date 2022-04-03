@@ -6,7 +6,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python3 /home/nvidia/LOTICv2/main.py ./media/coho-steelhead-test.mov ./models/yolov4-tiny-fish.weights ./models/yolov4-tiny-fish.cfg ./models/yolov4-tiny-fish.names TestSite RR 0.25 2 ./outfile/ 
+ExecStart=/usr/bin/python3 /home/nvidia/LOTICv2/main.py rtsp://192.168.1.88:554 ./models/NorthCoastModelv2.weights ./models/NorthCoastModelv2.weights ./models/NorthCoastModel.names ElderCreek RR 0.3 5 ./outfile/ --output_with_bounding_boxes no 
 WorkingDirectory=/home/nvidia/LOTICv2
 StandardOutput=file:/home/nvidia/LOTICv2/errorLogs/main_output.log
 StandardError=file:/home/nvidia/LOTICv2/errorLogs/error_file.log
