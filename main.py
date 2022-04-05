@@ -1,7 +1,6 @@
 from math import floor
 import signal
 import threading
-from xmlrpc.client import Boolean
 import cv2
 
 from argparse import ArgumentParser
@@ -46,7 +45,7 @@ def main():
     else:
         from output import jsonOut
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
-        fi = frameImport(args.video_source, ls) #takes in args flag for video source and creates pipeline for frame import
+        fi = frameImport(0, ls) #args.video_source #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.videoSource() #frame source
         video_info = [color_frame.get(cv2.CAP_PROP_FPS), #for use with IP cameras, it may be necessary to hardcode in your FPS since OpenCV has issues decyphering this value
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
@@ -60,7 +59,7 @@ def main():
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
     min_tracker_hits = 2 #needs 2 detections to initialize tracker for an individual
-    min_pixel_distance = video_info[1]/3 #after traveling %25 of the width of the screen in pixels, the tracker will evict the tracked individual
+    min_pixel_distance = video_info[1]/3 #after traveling 33% of the width of the screen in pixels, the tracker will evict the tracked individual
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
