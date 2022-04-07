@@ -72,8 +72,8 @@ class jsonOut_rs:
 
 class videoOutput:
 	def updateFilename(self):
-		self.time = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
-		self.outfile_name = self.outfile_dir+self.time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+		time = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+		self.outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
 
 	def writeFrames(self):
 		self.output = cv2.VideoWriter(self.outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
@@ -91,25 +91,31 @@ class videoOutput:
 		self.buffer_size = 60
 		self.video_buffer = queue.Queue(self.buffer_size) #gives you 60 frames before the fish shows up after the first detection
 
+
 	def writeVideo(self, tracked_fish, frame):
 		self.video_buffer.put(frame)
 		if self.video_buffer.qsize() == self.buffer_size:
 			lag_frame = self.video_buffer.get() 
 
-			if len(tracked_fish) > 0:
+			print(self.counter)
+			if (len(tracked_fish) > 0) and (self.counter == 0):
 				self.writeFrames()
 				self.output.write(lag_frame)
 				self.counter = 1
+				print('detection')
+
+			if len(tracked_fish) > 0:
+				self.counter = 1
+
+			if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
+				self.output.write(lag_frame)
+				self.counter+=1
+			elif self.counter == self.exit_threshold+self.buffer_size+1:
+				self.counter+=1
+				self.outfile_id+=1
+				self.updateFilename()
 			else:
-				if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
-					self.output.write(lag_frame)
-					self.counter+=1
-				elif self.counter == self.exit_threshold+self.buffer_size+1:
-					self.counter+=1
-					self.outfile_id+=1
-					self.updateFilename()
-				else:
-					self.counter = 0
-					self.updateFilename()
+				self.counter = 0
+				self.updateFilename()
 		else:
 			pass
