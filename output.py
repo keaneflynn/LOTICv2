@@ -97,20 +97,12 @@ class videoOutput:
 		if self.video_buffer.qsize() == self.buffer_size:
 			lag_frame = self.video_buffer.get() 
 
-			print(self.counter)
 			if (len(tracked_fish) > 0) and (self.counter == 0):
 				self.writeFrames()
 				self.output.write(lag_frame)
 				self.counter = 1
-			#elif len(tracked_fish) > 0:
-			#	self.counter = 1
-
-			'''
-			if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
-				self.output.write(lag_frame)
-				self.counter+=1
-			'''
-			if len(tracked_fish) > 0: #remove?
+			
+			if len(tracked_fish) > 0: 
 				self.counter = 1
 				self.output.write(lag_frame)
 			elif self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
