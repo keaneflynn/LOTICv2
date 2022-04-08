@@ -1,7 +1,6 @@
 from math import floor
 import signal
 import threading
-from xmlrpc.client import Boolean
 import cv2
 
 from argparse import ArgumentParser
@@ -60,7 +59,7 @@ def main():
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
     min_tracker_hits = 2 #needs 2 detections to initialize tracker for an individual
-    min_pixel_distance = video_info[1]/3 #after traveling %25 of the width of the screen in pixels, the tracker will evict the tracked individual
+    min_pixel_distance = video_info[1]/3 #after traveling 33% of the width of the screen in pixels, the tracker will evict the tracked individual
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
@@ -81,7 +80,7 @@ def main():
         
     
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-
+    
 
         jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
 

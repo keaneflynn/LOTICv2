@@ -10,7 +10,6 @@ class jsonOut:
 		self.site = sitename
 		self.class_names = []
 		self.directory = outfile_directory
-
 		os.makedirs(self.directory, exist_ok=True)
 
 		with open(names_file, "r") as f:
@@ -26,7 +25,7 @@ class jsonOut:
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
 						 fish.fish_id]
 
-			filename = json_data[2]+'-'+str(json_data[6])+'_'+json_data[5]
+			filename = json_data[5]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[6])
 			json_file = {
 				"dateTime":str(json_data[0]),
 				"site":json_data[1],
@@ -39,9 +38,12 @@ class jsonOut:
 
 
 class jsonOut_rs:
-	def __init__(self, sitename, names_file):
+	def __init__(self, sitename, names_file, outfile_directory):
 		self.site = sitename
 		self.class_names = []
+		self.directory = outfile_directory
+		os.makedirs(self.directory, exist_ok=True)
+
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
@@ -55,8 +57,7 @@ class jsonOut_rs:
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
 						 fish.fish_id]
 
-			directory = output_directory
-			filename = json_data[2]+'-'+str(json_data[6])+'_'+json_data[5]
+			filename = json_data[5]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[6])
 			json_file = {
 				"dateTime":str(json_data[0]),
 				"site":json_data[1],
@@ -65,15 +66,17 @@ class jsonOut_rs:
 				"travelDirection": json_data[4],
 				"fishLength_mm": json_data[5]
 				}	
-			with open("{}/{}.json".format(directory, filename), 'w') as f:
+			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
 				json.dump(json_file, f)
 
 
 class videoOutput:
 	def updateFilename(self):
-		time = datetime.datetime.now().strftime("%m-%d-%Y")
-		outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
-		self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
+		time = datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
+		self.outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
+
+	def writeFrames(self):
+		self.output = cv2.VideoWriter(self.outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
 
 	def __init__(self, sitename, exit_threshold, video_info, outfile_directory):
 		self.exit_threshold = int(exit_threshold * video_info[0])
@@ -86,34 +89,39 @@ class videoOutput:
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
 		self.buffer_size = 60
-		self.video_buffer = queue.Queue(self.buffer_size) #gives you 20 frames before the fish shows up after the first detection
-		
-		time = datetime.datetime.now().strftime("%m-%d-%Y")
-		outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
-		self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
+		self.video_buffer = queue.Queue(self.buffer_size) #gives you 60 frames before the fish shows up after the first detection
+
 
 	def writeVideo(self, tracked_fish, frame):
 		self.video_buffer.put(frame)
 		if self.video_buffer.qsize() == self.buffer_size:
 			lag_frame = self.video_buffer.get() 
 
-			if len(tracked_fish) > 0:
+			print(self.counter)
+			if (len(tracked_fish) > 0) and (self.counter == 0):
+				self.writeFrames()
 				self.output.write(lag_frame)
 				self.counter = 1
+			#elif len(tracked_fish) > 0:
+			#	self.counter = 1
+
+			'''
+			if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
+				self.output.write(lag_frame)
+				self.counter+=1
+			'''
+			if len(tracked_fish) > 0: #remove?
+				self.counter = 1
+				self.output.write(lag_frame)
+			elif self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
+				self.output.write(lag_frame)
+				self.counter+=1
+			elif self.counter == self.exit_threshold+self.buffer_size+1:
+				self.counter+=1
+				self.outfile_id+=1
+				self.updateFilename()
 			else:
-				if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): #add buffer size to exit threshold
-					self.output.write(lag_frame)
-					self.counter+=1
-				elif self.counter == self.exit_threshold+self.buffer_size+1:
-					self.counter+=1
-					self.outfile_id+=1
-					time = datetime.datetime.now().strftime("%m-%d-%Y")
-					outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
-					self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
-				else:
-					self.counter = 0
-					time = datetime.datetime.now().strftime("%m-%d-%Y")
-					outfile_name = self.outfile_dir+time+'_'+self.sitename+'_'+str(self.outfile_id)+'.avi'
-					self.output = cv2.VideoWriter(outfile_name, self.fourcc, self.fps, (self.frame_width, self.frame_height))
+				self.counter = 0
+				self.updateFilename()
 		else:
 			pass
