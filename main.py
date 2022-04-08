@@ -45,7 +45,7 @@ def main():
     else:
         from output import jsonOut
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
-        fi = frameImport(args.video_source, ls) #takes in args flag for video source and creates pipeline for frame import
+        fi = frameImport(0, ls) #args.video_source #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.videoSource() #frame source
         video_info = [color_frame.get(cv2.CAP_PROP_FPS), #for use with IP cameras, it may be necessary to hardcode in your FPS since OpenCV has issues decyphering this value
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
@@ -80,7 +80,7 @@ def main():
         
     
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-
+    
 
         jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
 

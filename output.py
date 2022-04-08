@@ -102,12 +102,18 @@ class videoOutput:
 				self.writeFrames()
 				self.output.write(lag_frame)
 				self.counter = 1
-				print('detection')
+			#elif len(tracked_fish) > 0:
+			#	self.counter = 1
 
-			if len(tracked_fish) > 0:
-				self.counter = 1
-
+			'''
 			if self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
+				self.output.write(lag_frame)
+				self.counter+=1
+			'''
+			if len(tracked_fish) > 0: #remove?
+				self.counter = 1
+				self.output.write(lag_frame)
+			elif self.counter in range(1, (self.exit_threshold+self.buffer_size+1)): 
 				self.output.write(lag_frame)
 				self.counter+=1
 			elif self.counter == self.exit_threshold+self.buffer_size+1:
