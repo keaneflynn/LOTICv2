@@ -4,7 +4,7 @@ import platform
 class objectDetection:
     def __init__(self, confidence_activation, weights_file, config_file, names_file):
         self.confidence = confidence_activation
-        self.nmsThreshold = 0.4
+        self.nmsThreshold = 0.2
         #self.color = (0, 255, 255)
 
         self.weights_file = weights_file
@@ -50,4 +50,4 @@ class outputTesting:
             cv2.putText(frame, label, (t[3][0], t[3][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.5,
                         self.color, 6)
         #frame = cv2.resize(frame, (360,640))
-        #cv2.imshow("detections", frame)
+        cv2.imshow("detections", frame)

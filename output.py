@@ -88,8 +88,8 @@ class videoOutput:
 		self.sitename = sitename
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
-		self.buffer_size = 60
-		self.video_buffer = queue.Queue(self.buffer_size) #gives you 60 frames before the fish shows up after the first detection
+		self.buffer_size = 10 #can only seem to get 10 frames on the realsense camera before running into a buffer issue, no matter the frame size
+		self.video_buffer = queue.Queue(self.buffer_size) #gives you x amount frames before the fish shows up after the first detection
 
 
 	def writeVideo(self, tracked_fish, frame):

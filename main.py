@@ -10,6 +10,7 @@ from objectTracker import objectTracker, direction
 from output import videoOutput
 from lotic_signal import LoticSignal
 
+
 def main():
     parser = ArgumentParser(description='LOTICv2')
     parser.add_argument('video_source', type=str, help='identify your video source, using "realsense" will result in use with realsense camera')
@@ -36,7 +37,7 @@ def main():
     if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
         from realsense import realsense
         from output import jsonOut_rs
-        jo = jsonOut_rs()
+        jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory)
         rs = realsense()
         video_info = [rs.getFPS(),
                       rs.getFrameWidth(),
@@ -51,10 +52,11 @@ def main():
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
-    t1 = threading.Thread(target=fi.receiveFrame)
-    t1.start()
+        t1 = threading.Thread(target=fi.receiveFrame)
+        t1.start()
 
     vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
+    oTest = outputTesting(args.names_file)
 
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
@@ -63,37 +65,37 @@ def main():
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
-
-    while ls.keep_running():
+    while cv2.waitKey(1) < 1: #ls.keep_running():
         if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
             frame = fi.grabFrame() #Imports frame from video source 
             if frame is None:
                 break
-
+        
 
         classes, scores, boxes = od.detection(frame) #performs object detection on individual frame from method in cv2 library
+        #functional
         
-
         tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames 
-        
-    
+        #functional
+
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-    
+        #functional
 
-        jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
-
-        
-        vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
-
+        #jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+        #functional 
 
         if args.output_with_bounding_boxes == 'yes':
-            oTest = outputTesting(args.names_file) #remove for actual script
-            oTest.testOutputFrames(frame, tracked_fish) #remove for actual script
+            oTest.testOutputFrames(frame, tracked_fish) 
+        
 
+        vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
+        #functional
+        
+        
     t1.join()
-
+    
 
 if __name__ == '__main__':
     main()
