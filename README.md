@@ -1,3 +1,5 @@
+If you have more questions or want some advice on implementation, email me at keaneflynn@nevada.unr.edu. Cheers.
+
 # LOTICv2
 Welcome to the updated version of LOTIC (Lightweight Object Tracking Image Capturer)!
 This updated version of the software is designed for used with the Nvidia Jetson Xavier NX with an internet protocol (IP) camera.
