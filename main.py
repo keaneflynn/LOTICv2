@@ -36,8 +36,9 @@ def main():
 
     if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
         from realsense import realsense
-        from output import jsonOut_rs
-        jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory)
+        from output import jsonOut_rs, jsonOut
+        #jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory)
+        jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
         rs = realsense()
         video_info = [rs.getFPS(),
                       rs.getFrameWidth(),
@@ -83,7 +84,13 @@ def main():
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
         #functional
 
-        #jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+        for fish in tracked_fish:
+            centerCoords_rs = ((fish[3][1] + (fish[3][3] // 2)), 
+                             (fish[3][0] + (fish[3][2] // 2)))
+            distanced_cm = depth_frame[centerCoords_rs] / 10
+            print('Distance to '+str(fish[1])+' is '+str(distanced_cm)+' cm')
+
+        jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         #functional 
 
         if args.output_with_bounding_boxes == 'yes':
