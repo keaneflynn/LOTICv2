@@ -87,8 +87,14 @@ def main():
         for fish in tracked_fish:
             centerCoords_rs = ((fish[3][1] + (fish[3][3] // 2)), 
                              (fish[3][0] + (fish[3][2] // 2)))
-            distanced_cm = depth_frame[centerCoords_rs] / 10
+
+            distance_mm = depth_frame[centerCoords_rs]
+
+            fish_length_cm = (distance_mm * fish[3,2] * 3.60) / (1.93 * video_info[1]) / 10
+
             print('Distance to '+str(fish[1])+' is '+str(distanced_cm)+' cm')
+
+            print(fish_length_cm)
 
         jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         #functional 
