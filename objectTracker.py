@@ -22,7 +22,7 @@ def check_species(detected_species, score, species_dict):
         species_dict[detected_species] = [1, score]
 
     if len(species_dict) == 1:
-        return detected_species
+        return detected_species, species_dict
     else:
         spec_max = 0
         species = None
@@ -30,17 +30,33 @@ def check_species(detected_species, score, species_dict):
             if v[1] > spec_max:
                 species = k
                 spec_max = v[1]
-    return species
+    return species, species_dict
+
+
+def get_length_cm(center, depth_f, box_width, frame_width):
+    center_tup = (center[0], center[1])
+    distance_mm = depth_f[center_tup]
+    return (distance_mm * box_width * 3.60) / (1.93 * frame_width) / 10
+
+
+def update_length_list(center, depth_f, box_width, frame_width, length_list):
+    len_cm = get_length_cm(center, depth_f, box_width, frame_width)
+    if (0.25 * frame_width) < box[0] < (0.75 * frame_width):
+        length_list[0].append(len_cm).sort()
+        length_list[1].append(len_cm).sort()
+    else:
+        length_list[0].append(len_cm).sort()
+    return length_list
 
 
 class Fish:
     id_count = 0
 
-    def __init__(self, class_id, score, box, frame):
+    def __init__(self, class_id, score, box, frame, depth, frame_width):
         self.fish_id = Fish.id_count
         Fish.id_count += 1
         self.class_id = class_id
-        self.hits_dict = {}
+        self.hits_dict = {class_id: [1, score]}
         self.box = box
         self.center = [box[0], box[1]]
         self.max_confidence = score
@@ -49,14 +65,20 @@ class Fish:
         self.hit_streak = 0
         self.frames_without_hit = 0
         self.first_center = [box[0], box[1]]
+        # length_list in the format [[list of all length measurements],
+        #                           [list of length measurements where center x in center of frame]]
+        self.length_list = [[], []]
+        self.length_list = update_length_list([box[0], box[1]], depth, box[2], frame_width, self.length_list)
 
-    def update_fish(self, box, score, frame, class_id):
+    def update_fish(self, box, score, frame, class_id, depth, frame_width):
         # updates state of tracked objects
         self.hit_streak += 1
         self.box = box
         self.center = [box[0], box[1]]
         self.frames_without_hit = 0
-        self.class_id = check_species(class_id, score, self.hits_dict)
+        self.class_id, self.hits_dict = check_species(class_id, score, self.hits_dict)
+        self.length_list = update_lenght_list([box[0], box[1]], depth, box[2], frame_width, self.length_list)
+
         if score > self.max_confidence:
             self.max_confidence = score
             self.max_c_frame = frame
@@ -100,6 +122,14 @@ def association(tracks, detections, min_distance):
     return matched_indices, unmatched_detection_indices
 
 
+def evaluate_length(len_list):
+    # if more than 6 measurements are taken in center frame, return 80% median measurement
+    if len(len_list[1]) >= 7:
+        return len_list[1][len(len_list[1]) * 4 // 5]
+    else:
+        return len_list[0][len(len_list[0]) * 4 // 5]
+
+
 class objectTracker:
 
     def __init__(self, exit_threshold, min_hits, min_distance):
@@ -112,7 +142,7 @@ class objectTracker:
         self.frame_count = 0
         # list of final objects tracked in the form [fish_id, class_id, score, box]
 
-    def update_tracker(self, classes, scores, boxes, frame):
+    def update_tracker(self, classes, scores, boxes, frame, depth, frame_width):
         self.frame_count += 1
 
         # predicts current frame location of tracked_objects using previous frame information
@@ -140,11 +170,11 @@ class objectTracker:
             b = dets[m[1]].box
             s = dets[m[1]].score
             c = dets[m[1]].class_id
-            self.tracked_objects[m[0]].update_fish(b, s, frame, c)
+            self.tracked_objects[m[0]].update_fish(b, s, frame, c, depth, frame_width)
 
         # initialize new fish for unmatched detections and append to tracked_objects
         for u in umd:
-            new_fish = Fish(dets[u].class_id, dets[u].score, dets[u].box, frame)
+            new_fish = Fish(dets[u].class_id, dets[u].score, dets[u].box, frame, depth, frame_width)
             self.tracked_objects.append(new_fish)
 
         ret = []
@@ -173,6 +203,8 @@ class direction:
     # Could potentially use difference between first and last detection location, however that might create an issue depending upon detection locations
     # There is potential here to improve the algorithm depending upon tracker and neural network efficacy
     def directionOutput(evicted_fish, camera_stream_side, frame_width):
+        directions = []
+        lengths = []
         for fish in evicted_fish:
             if camera_stream_side == 'RR':
                 if (fish.first_center[0] < frame_width / 2) and (fish.center[0] >= frame_width / 2):
@@ -193,10 +225,11 @@ class direction:
                     travel_direction = 'mill: remained downstream'
                 else:
                     travel_direction = 'mill: remained upstream'
+            directions.append(travel_direction)
+            lengths.append(evaluate_length(fish.length_list))
+        return directions, lengths
 
-            return travel_direction
-
-
+'''
 class depthMapping:
     def __init__(self):
         self.sensor_width_mm = 3.60
@@ -227,4 +260,6 @@ class depthMapping:
     def updateAverageLength(self):
         ###Use time to set breakout threshold. If theshold is exceeded then break function###
         self.objectLengths = getLenths()
+'''
+
 

@@ -34,16 +34,16 @@ def main():
                          args.names_file) #initialize class list and model params
     od.loadNN() #initializes the parameters for which the neural network needs to run (these are optimized for nvidia jetson w/CUDA)
 
-    if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
-        from realsense import realsense
-        from output import jsonOut_rs, jsonOut
-        #jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory)
-        jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
-        rs = realsense()
-        video_info = [rs.getFPS(),
-                      rs.getFrameWidth(),
-                      rs.getFrameHeight()]
-
+    #if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
+    from realsense import realsense
+    from output import jsonOut_rs, jsonOut
+    #jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory)
+    # jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
+    rs = realsense()
+    video_info = [rs.getFPS(),
+                  rs.getFrameWidth(),
+                  rs.getFrameHeight()]
+    ''' 
     else:
         from output import jsonOut
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
@@ -55,6 +55,7 @@ def main():
 
         t1 = threading.Thread(target=fi.receiveFrame)
         t1.start()
+    '''
 
     vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
     oTest = outputTesting(args.names_file)
@@ -67,36 +68,27 @@ def main():
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while cv2.waitKey(1) < 1: #ls.keep_running():
-        if args.video_source == 'realsense': #Current variable name for testing only
-            grabbed, depth_frame, frame = rs.grab_frame()
+        #if args.video_source == 'realsense': #Current variable name for testing only
+        grabbed, depth_frame, frame = rs.grab_frame()
+
+            #must be the fisrt condition to run^
+        ''' 
         else:
             frame = fi.grabFrame() #Imports frame from video source 
             if frame is None:
                 break
-        
+        '''
 
         classes, scores, boxes = od.detection(frame) #performs object detection on individual frame from method in cv2 library
         #functional
-        
-        tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames 
+
+        tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame, depth_frame, video_info[1]) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames
         #functional
 
-        travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
+        travel_direction, lengths = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
         #functional
 
-        for fish in tracked_fish:
-            centerCoords_rs = ((fish[3][1] + (fish[3][3] // 2)), 
-                             (fish[3][0] + (fish[3][2] // 2)))
-
-            distance_mm = depth_frame[centerCoords_rs]
-
-            fish_length_cm = (distance_mm * fish[3,2] * 3.60) / (1.93 * video_info[1]) / 10
-
-            print('Distance to '+str(fish[1])+' is '+str(distanced_cm)+' cm')
-
-            print(fish_length_cm)
-
-        jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+        jo.writeFile(evicted_fish, travel_direction, lengths) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         #functional 
 
         if args.output_with_bounding_boxes == 'yes':

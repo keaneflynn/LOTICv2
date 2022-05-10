@@ -15,15 +15,16 @@ class jsonOut:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile(self, evicted_fish, travel_direction):
-		for fish in evicted_fish:
+	def writeFile(self, evicted_fish, travel_direction, lengths):
+		for fish, td, length in zip(evicted_fish, travel_direction, lengths):
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
 		  				 self.class_names[fish.class_id], 
 		  				 fish.max_confidence,
-		  				 travel_direction,
+		  				 td,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
-						 fish.fish_id]
+						 fish.fish_id,
+						 length]
 
 			filename = json_data[5]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[6])
 			json_file = {
@@ -31,6 +32,7 @@ class jsonOut:
 				"site":json_data[1],
 				"species":json_data[2],
 				"maxConfidence": np.float64(json_data[3]),
+				"length": json_data[7],
 				"travelDirection": json_data[4]
 				}	
 			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
