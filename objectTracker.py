@@ -22,7 +22,7 @@ def check_species(detected_species, score, species_dict):
         species_dict[detected_species] = [1, score]
 
     if len(species_dict) == 1:
-        return detected_species
+        return detected_species, species_dict
     else:
         spec_max = 0
         species = None
@@ -30,7 +30,7 @@ def check_species(detected_species, score, species_dict):
             if v[1] > spec_max:
                 species = k
                 spec_max = v[1]
-    return species
+    return species, species_dict
 
 
 class Fish:
@@ -40,7 +40,7 @@ class Fish:
         self.fish_id = Fish.id_count
         Fish.id_count += 1
         self.class_id = class_id
-        self.hits_dict = {}
+        self.hits_dict = {class_id: [1, score]}
         self.box = box
         self.center = [box[0], box[1]]
         self.max_confidence = score
@@ -56,7 +56,7 @@ class Fish:
         self.box = box
         self.center = [box[0], box[1]]
         self.frames_without_hit = 0
-        self.class_id = check_species(class_id, score, self.hits_dict)
+        self.class_id, self.hits_dict = check_species(class_id, score, self.hits_dict)
         if score > self.max_confidence:
             self.max_confidence = score
             self.max_c_frame = frame
