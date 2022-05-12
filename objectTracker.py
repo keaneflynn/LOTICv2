@@ -8,7 +8,7 @@ class Detection:
         self.class_id = class_id
         self.score = score
         self.box = box
-        self.center = [box[0], box[1]]
+        self.center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
 
 
 def check_species(detected_species, score, species_dict):
@@ -34,14 +34,15 @@ def check_species(detected_species, score, species_dict):
 
 
 def get_length_cm(center, depth_f, box_width, frame_width):
-    center_tup = (center[0], center[1])
+    print(center)
+    center_tup = (center[0], center[1]) #realsense cameras use y,x coordinate system FIX
     distance_mm = depth_f[center_tup]
-    return (distance_mm * box_width * 3.60) / (1.93 * frame_width) / 10
+    return ((distance_mm * box_width * 3.60) / (1.93 * frame_width)) / 10
 
 
 def update_length_list(center, depth_f, box_width, frame_width, length_list):
     len_cm = get_length_cm(center, depth_f, box_width, frame_width)
-    if (0.25 * frame_width) < box[0] < (0.75 * frame_width):
+    if (0.25 * frame_width) < center[0] < (0.75 * frame_width): #changing 'box[0]' to (box[2] // 2 + box[0])
         length_list[0].append(len_cm).sort()
         length_list[1].append(len_cm).sort()
     else:
@@ -58,26 +59,26 @@ class Fish:
         self.class_id = class_id
         self.hits_dict = {class_id: [1, score]}
         self.box = box
-        self.center = [box[0], box[1]]
+        self.center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
         self.max_confidence = score
         self.score = score
         self.max_c_frame = frame
         self.hit_streak = 0
         self.frames_without_hit = 0
-        self.first_center = [box[0], box[1]]
+        self.first_center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
         # length_list in the format [[list of all length measurements],
         #                           [list of length measurements where center x in center of frame]]
         self.length_list = [[], []]
-        self.length_list = update_length_list([box[0], box[1]], depth, box[2], frame_width, self.length_list)
+        self.length_list = update_length_list([(box[3] // 2 + box[1]), (box[2] // 2 + box[0])], depth, box[2], frame_width, self.length_list) #rs center coordinate system (y,x)
 
     def update_fish(self, box, score, frame, class_id, depth, frame_width):
         # updates state of tracked objects
         self.hit_streak += 1
         self.box = box
-        self.center = [box[0], box[1]]
+        self.center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
         self.frames_without_hit = 0
         self.class_id, self.hits_dict = check_species(class_id, score, self.hits_dict)
-        self.length_list = update_lenght_list([box[0], box[1]], depth, box[2], frame_width, self.length_list)
+        self.length_list = update_length_list([(box[3] // 2 + box[1]), (box[2] // 2 + box[0])], depth, box[2], frame_width, self.length_list) #rs center coordinate system (y,x)
 
         if score > self.max_confidence:
             self.max_confidence = score
