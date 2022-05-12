@@ -50,4 +50,4 @@ class outputTesting:
             cv2.putText(frame, label, (t[3][0], t[3][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.5,
                         self.color, 6)
         #frame = cv2.resize(frame, (360,640))
-        cv2.imshow("detections", frame)
+        #cv2.imshow("detections", frame)

@@ -67,7 +67,7 @@ def main():
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
-    while cv2.waitKey(1) < 1: #ls.keep_running():
+    while ls.keep_running():
         if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         
@@ -84,7 +84,7 @@ def main():
         
 
         travel_direction, lengths = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-        
+        print(lengths)
 
         jo.writeFile(evicted_fish, travel_direction, lengths) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         

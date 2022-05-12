@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import math  # needed for math.hypot (needed for comparing objects between frames)
+import math  
 
 
 class Detection:
@@ -8,7 +8,7 @@ class Detection:
         self.class_id = class_id
         self.score = score
         self.box = box
-        self.center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
+        self.center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])] 
 
 
 def check_species(detected_species, score, species_dict):
@@ -34,19 +34,23 @@ def check_species(detected_species, score, species_dict):
 
 
 def get_length_cm(center, depth_f, box_width, frame_width):
-    print(center)
-    center_tup = (center[0], center[1]) #realsense cameras use y,x coordinate system FIX
+    center_tup = (center[0], center[1]) 
     distance_mm = depth_f[center_tup]
-    return ((distance_mm * box_width * 3.60) / (1.93 * frame_width)) / 10
+    return ((distance_mm * box_width * 2.45) / (1.93 * frame_width)) / 10 #parameters for intel RealSense d435 camera unit
 
 
 def update_length_list(center, depth_f, box_width, frame_width, length_list):
-    len_cm = get_length_cm(center, depth_f, box_width, frame_width)
-    if (0.25 * frame_width) < center[0] < (0.75 * frame_width): #changing 'box[0]' to (box[2] // 2 + box[0])
-        length_list[0].append(len_cm).sort()
-        length_list[1].append(len_cm).sort()
+    len_cm = get_length_cm(center, depth_f, box_width, frame_width) 
+    if len_cm < 0.1:
+        pass
+    elif (0.25 * frame_width) < center[0] < (0.75 * frame_width): 
+        length_list[0].append(len_cm)
+        length_list[0].sort()
+        length_list[1].append(len_cm)
+        length_list[1].sort()
     else:
-        length_list[0].append(len_cm).sort()
+        length_list[0].append(len_cm)
+        length_list[0].sort()
     return length_list
 
 
@@ -126,9 +130,9 @@ def association(tracks, detections, min_distance):
 def evaluate_length(len_list):
     # if more than 6 measurements are taken in center frame, return 80% median measurement
     if len(len_list[1]) >= 7:
-        return len_list[1][len(len_list[1]) * 4 // 5]
+        return len_list[1][len(len_list[1]) * 2 // 5] # * 4 originally
     else:
-        return len_list[0][len(len_list[0]) * 4 // 5]
+        return len_list[0][len(len_list[0]) * 4 // 5] # * 4 originally
 
 
 class objectTracker:

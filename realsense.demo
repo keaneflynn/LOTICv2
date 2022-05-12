@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 main.py realsense ./models/yolov4-tiny.weights ./models/yolov4-tiny.cfg ./models/coco.names TestSite RR 0.999 5 ./outfile/ --output_with_bounding_boxes yes
+python3 main.py realsense ./models/yolov4-tiny.weights ./models/yolov4-tiny.cfg ./models/coco.names TestSite RR 0.8 3 ./outfile/ --output_with_bounding_boxes yes
