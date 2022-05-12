@@ -47,7 +47,7 @@ class jsonOut_rs:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile_rs(self):
+	def writeFile_rs(self, evicted_fish, travel_direction):
 		for fish in evicted_fish:
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
@@ -88,8 +88,10 @@ class videoOutput:
 		self.sitename = sitename
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
-		self.buffer_size = 60
-		self.video_buffer = queue.Queue(self.buffer_size) #gives you 60 frames before the fish shows up after the first detection
+		self.buffer_size = 5 #realsense camera seems to not like a high value here, crank it up for IP cameras
+		self.video_buffer = queue.Queue(self.buffer_size) 
+
+		self.updateFilename()
 
 
 	def writeVideo(self, tracked_fish, frame):

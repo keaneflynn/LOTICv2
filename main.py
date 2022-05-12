@@ -35,8 +35,9 @@ def main():
 
     if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
         from realsense import realsense
-        from output import jsonOut_rs
-        jo = jsonOut_rs()
+        from output import jsonOut_rs, jsonOut
+        #jo = jsonOut_rs()
+        jo = jsonOut(args.site_code, args.names_file, args.output_file_directory) #eventually migrate over to jsonOut_rs, temporary
         rs = realsense()
         video_info = [rs.getFPS(),
                       rs.getFrameWidth(),
@@ -51,8 +52,8 @@ def main():
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
-    t1 = threading.Thread(target=fi.receiveFrame)
-    t1.start()
+        t1 = threading.Thread(target=fi.receiveFrame)
+        t1.start()
 
     vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
 
@@ -64,7 +65,7 @@ def main():
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
 
-    while ls.keep_running():
+    while cv2.waitKey(1) < 1: #ls.keep_running():
         if args.video_source == 'realsense': #Current variable name for testing only
             grabbed, depth_frame, frame = rs.grab_frame()
         else:
