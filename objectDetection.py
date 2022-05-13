@@ -49,5 +49,5 @@ class outputTesting:
             cv2.rectangle(frame, t[3], self.color, 2)
             cv2.putText(frame, label, (t[3][0], t[3][1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 2.5,
                         self.color, 6)
-        #frame = cv2.resize(frame, (360,640))
+        #frame = cv2.resize(frame, (360,640)) #good for lotic.demo vid since its 4k
         #cv2.imshow("detections", frame)

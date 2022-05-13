@@ -6,7 +6,7 @@ import cv2
 from argparse import ArgumentParser
 from objectDetection import objectDetection, outputTesting #Remove testing for final script
 from frameImport import *
-from objectTracker import objectTracker, direction
+from objectTracker import objectTracker, direction, measure
 from output import videoOutput
 from lotic_signal import LoticSignal
 
@@ -36,9 +36,8 @@ def main():
 
     if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
         from realsense import realsense
-        from output import jsonOut_rs, jsonOut
-        #jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory) #add this back once length is functional
-        jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
+        from output import jsonOut_rs
+        jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory) #add this back once length is functional
         rs = realsense()
         video_info = [rs.getFPS(),
                       rs.getFrameWidth(),
@@ -81,12 +80,18 @@ def main():
         
 
         tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame, depth_frame, video_info[1]) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames
+        if len(tracked_fish) > 1:
+            print('check bitch')
+
+        travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
         
 
-        travel_direction, lengths = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-        print(lengths)
+        if args.video_source == 'realsense':
+            lengths = measure.grabLength(evicted_fish)
+            jo.writeFile_rs(evicted_fish, travel_direction, lengths)
 
-        jo.writeFile(evicted_fish, travel_direction, lengths) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+        else:
+            jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         
 
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
