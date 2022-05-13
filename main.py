@@ -38,7 +38,7 @@ def main():
         from realsense import realsense
         from output import jsonOut_rs
         from objectTracker_rs import objectTracker, direction, measure
-        jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory) #add this back once length is functional
+        jo = jsonOut_rs(args.site_code, args.names_file, args.output_file_directory) 
         rs = realsense()
         video_info = [rs.getFPS(),
                       rs.getFrameWidth(),
@@ -56,7 +56,7 @@ def main():
 
         t1 = threading.Thread(target=fi.receiveFrame)
         t1.start()
-    
+        
 
     vo = videoOutput(args.site_code, args.video_exit_threshold, video_info, args.output_file_directory)
     oTest = outputTesting(args.names_file)
@@ -68,10 +68,11 @@ def main():
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
+
     while ls.keep_running():
         if args.video_source == 'realsense': 
             grabbed, depth_frame, frame = rs.grab_frame() #Imports frame from realsense camera
-        
+
         else:
             frame = fi.grabFrame() #Imports frame from video source 
             if frame is None:

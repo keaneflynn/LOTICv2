@@ -47,6 +47,7 @@ class jsonOut_rs:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
+
 	def writeFile_rs(self, evicted_fish, travel_direction, lengths):
 		for fish, td, length in zip(evicted_fish, travel_direction, lengths):
 			json_data = [datetime.datetime.utcnow(), 
