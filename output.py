@@ -16,8 +16,6 @@ class jsonOut:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
 	def writeFile(self, evicted_fish, travel_direction):
-		print(evicted_fish)
-		print(travel_direction)
 		for fish, td in zip(evicted_fish, travel_direction): #'NoneType' object is not iterable
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
@@ -67,34 +65,11 @@ class jsonOut_rs:
 				"species":json_data[2],
 				"maxConfidence": np.float64(json_data[3]),
 				"travelDirection": json_data[4],
-				"length": json_data[7]
+				"length_cm": json_data[7]
 				}	
 			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
 				json.dump(json_file, f)
 
-	'''
-	def writeFile_rs(self):
-		for fish in evicted_fish:
-			json_data = [datetime.datetime.utcnow(), 
-		  				 self.site, 
-		  				 self.class_names[fish.class_id[0]], 
-		  				 fish.max_confidence,
-		  				 travel_direction,
-						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
-						 fish.fish_id]
-
-			filename = json_data[5]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[6])
-			json_file = {
-				"dateTime":str(json_data[0]),
-				"site":json_data[1],
-				"species":json_data[2],
-				"maxConfidence": np.float64(json_data[3]),
-				"travelDirection": json_data[4],
-				"fishLength_mm": json_data[5]
-				}	
-			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
-				json.dump(json_file, f)
-	'''
 
 class videoOutput:
 	def updateFilename(self):
@@ -115,7 +90,7 @@ class videoOutput:
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
 		self.buffer_size = 10 #can only seem to get 10 frames on the realsense camera before running into a buffer issue, no matter the frame size
-		self.video_buffer = queue.Queue(self.buffer_size) #gives you x amount frames before the fish shows up after the first detection
+		self.video_buffer = queue.Queue(self.buffer_size) #gives you x amount frames before the fish shows up before the first detection
 
 		self.updateFilename()
 

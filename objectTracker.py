@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import math  # needed for math.hypot (needed for comparing objects between frames)
+import math  
 
 
 class Detection:

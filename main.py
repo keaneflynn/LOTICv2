@@ -4,7 +4,7 @@ import threading
 import cv2
 
 from argparse import ArgumentParser
-from objectDetection import objectDetection, outputTesting #Remove testing for final script
+from objectDetection import objectDetection, outputTesting 
 from frameImport import *
 from output import videoOutput
 from lotic_signal import LoticSignal
@@ -31,6 +31,7 @@ def main():
                          args.weights_file,
                          args.config_file,
                          args.names_file) #initialize class list and model params
+
     od.loadNN() #initializes the parameters for which the neural network needs to run (these are optimized for nvidia jetson w/CUDA)
 
     if args.video_source == 'realsense': #still needs updates to work with realsense camera, will focus on this later
@@ -68,8 +69,8 @@ def main():
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
     while ls.keep_running():
-        if args.video_source == 'realsense': #Current variable name for testing only
-            grabbed, depth_frame, frame = rs.grab_frame()
+        if args.video_source == 'realsense': 
+            grabbed, depth_frame, frame = rs.grab_frame() #Imports frame from realsense camera
         
         else:
             frame = fi.grabFrame() #Imports frame from video source 
@@ -83,8 +84,8 @@ def main():
         if args.video_source == 'realsense':
             tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame, depth_frame, video_info[1]) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames
             travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
-            lengths = measure.grabLength(evicted_fish)
-            jo.writeFile_rs(evicted_fish, travel_direction, lengths)
+            lengths = measure.grabLength(evicted_fish) #measures tracked objects based on their bounding box dimensions
+            jo.writeFile_rs(evicted_fish, travel_direction, lengths) #output json with object length measurement
 
         else:
             tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) 
