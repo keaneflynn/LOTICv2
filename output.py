@@ -16,7 +16,9 @@ class jsonOut:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
 	def writeFile(self, evicted_fish, travel_direction):
-		for fish, td in zip(evicted_fish, travel_direction):
+		print(evicted_fish)
+		print(travel_direction)
+		for fish, td in zip(evicted_fish, travel_direction): #'NoneType' object is not iterable
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
 		  				 self.class_names[fish.class_id], 
