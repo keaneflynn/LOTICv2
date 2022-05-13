@@ -80,8 +80,7 @@ def main():
         
 
         tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame, depth_frame, video_info[1]) #object tracker (shoutout Jack) that updates output from object detection and can track individuals across a series of frames
-        if len(tracked_fish) > 1:
-            print('check bitch')
+
 
         travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1]) #returns the direction of travel for "evicted fish" informed by object tracker
         
