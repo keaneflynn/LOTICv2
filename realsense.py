@@ -1,7 +1,6 @@
 import pyrealsense2 as rs
 import numpy as np
 
-print("hello")
 
 class realsense:
     def __init__(self):

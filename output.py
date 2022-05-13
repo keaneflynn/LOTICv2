@@ -16,12 +16,12 @@ class jsonOut:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
 	def writeFile(self, evicted_fish, travel_direction):
-		for fish in evicted_fish:
+		for fish, td in zip(evicted_fish, travel_direction): #'NoneType' object is not iterable
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
 		  				 self.class_names[fish.class_id], 
 		  				 fish.max_confidence,
-		  				 travel_direction,
+		  				 td,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
 						 fish.fish_id]
 
@@ -47,15 +47,17 @@ class jsonOut_rs:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile_rs(self, evicted_fish, travel_direction):
-		for fish in evicted_fish:
+
+	def writeFile_rs(self, evicted_fish, travel_direction, lengths):
+		for fish, td, length in zip(evicted_fish, travel_direction, lengths):
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
-		  				 self.class_names[fish.class_id[0]], 
+		  				 self.class_names[fish.class_id], 
 		  				 fish.max_confidence,
-		  				 travel_direction,
+		  				 td,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
-						 fish.fish_id]
+						 fish.fish_id,
+						 length]
 
 			filename = json_data[5]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[6])
 			json_file = {
@@ -64,7 +66,7 @@ class jsonOut_rs:
 				"species":json_data[2],
 				"maxConfidence": np.float64(json_data[3]),
 				"travelDirection": json_data[4],
-				"fishLength_mm": json_data[5]
+				"length_cm": json_data[7]
 				}	
 			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
 				json.dump(json_file, f)
@@ -88,8 +90,8 @@ class videoOutput:
 		self.sitename = sitename
 		self.outfile_id = 0
 		self.outfile_dir = outfile_directory
-		self.buffer_size = 5 #realsense camera seems to not like a high value here, crank it up for IP cameras
-		self.video_buffer = queue.Queue(self.buffer_size) 
+		self.buffer_size = 10 #can only seem to get 10 frames on the realsense camera before running into a buffer issue, no matter the frame size
+		self.video_buffer = queue.Queue(self.buffer_size) #gives you x amount frames before the fish shows up before the first detection
 
 		self.updateFilename()
 
