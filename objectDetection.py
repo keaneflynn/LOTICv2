@@ -1,11 +1,9 @@
 import cv2
-import platform
 
 class objectDetection:
     def __init__(self, confidence_activation, weights_file, config_file, names_file):
         self.confidence = confidence_activation
-        self.nmsThreshold = 0.2
-        #self.color = (0, 255, 255)
+        self.nmsThreshold = 0.3
 
         self.weights_file = weights_file
         self.config_file = config_file
@@ -15,9 +13,8 @@ class objectDetection:
             self.class_names = [cname.strip() for cname in f.readlines()]
 
     def loadNN(self):
-        os_name = platform.system()
         net = cv2.dnn.readNet(self.weights_file, self.config_file)
-        if os_name == 'Linux':
+        if cv2.cuda.getCudaEnabledDeviceCount() == 1:
             net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA) #must be enabled for GPU use
             net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16) #reduced latency nn processing, slight hit on accuracy
             #net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA) #higher accuracy target use, slower
