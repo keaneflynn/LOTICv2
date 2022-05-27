@@ -14,6 +14,7 @@ This repository was created and designed by Keane Flynn, Ryan Flynn, Jack Rogers
 
 ![Detection of juvenile coho salmon in Woods Creek](https://github.com/keaneflynn/LOTICv2/blob/main/media/cohoGif.gif)
 
+![Detection of adult salmon at the viewing window of the fish ladder in the Russian River](https://github.com/keaneflynn/LOTICv2/blob/main/media/fishLadder.gif)
 
 ## Necessary Hardware
 - Nvidia Jetson Xavier NX (has not been tested, but should probably work on an AGX if you can get one)
