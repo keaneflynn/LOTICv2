@@ -31,6 +31,12 @@ While run either continuously or on a video clip, LOTIC will output an .avi vide
 To concatenate the information from the json files, programs like JQ or the pandas package in python can be leveraged to convert this data into csv files for an easier to manipulate data structure. 
 
 
+![Detection of a juvenile steelhead trout on elder creek](https://github.com/keaneflynn/LOTICv2/blob/main/media/juvenileTroutLOTIC.gif)
+
+
+![json output from above video file](https://github.com/keaneflynn/LOTICv2/blob/main/media/jsonOutput.png)
+
+
 ## Running a sample video
 To run a demo of the LOTIC program, navigate into the LOTIC directory from your terminal and issue the following command:
 ```
