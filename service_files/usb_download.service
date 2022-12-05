@@ -1,0 +1,14 @@
+[Unit]
+Description=Program will look for a samsung t7 SSD every 30 seconds and, upon detection, will transfer all of the files from a source directory to the flash drive.
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/home/garcia/LOTIC/LOTICv2/bashScripts/usb_download.sh
+WorkingDirectory=/home/garcia/LOTIC/LOTICv2
+StandardOutput=file:/home/garcia/LOTIC/LOTICv2/errorLogs/usbTransfer.dat
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
