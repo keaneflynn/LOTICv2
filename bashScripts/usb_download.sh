@@ -17,7 +17,7 @@ then
 		exit 0
 	else
 	mv $SOURCE_FOLDER/* $DESTINATION_FOLDER
-	systemctl status usb_temp.service >> $DESTINATION_FOLDER/systemStatus.log
+	systemctl status usb_download.service >> $DESTINATION_FOLDER/systemStatus.log
 	fi
 else
 	echo 'No USB drive detected'
@@ -25,11 +25,11 @@ else
 fi
 
 cd $DESTINATION_FOLDER
-zip -q $FILENAME *.json *.avi *.log
+zip -q $FILENAME *.avi *.json *.log
 rm *.avi && rm *.json && rm *.log 
 
 cd ~/ 
-udisksctl unmount -b /dev/sda1 
+udisksctl unmount -b /dev/sda1 #MIGHT NEED TO BE UPDATED FOR JETSONS
 udisksctl power-off -b /dev/sda1 
 exit 0
 
