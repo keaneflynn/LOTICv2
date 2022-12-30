@@ -50,7 +50,7 @@ def main():
         jo = jsonOut(args.site_code, args.names_file, args.output_file_directory)
         fi = frameImport(args.video_source, ls) #takes in args flag for video source and creates pipeline for frame import
         color_frame = fi.videoSource() #frame source
-        video_info = [color_frame.get(cv2.CAP_PROP_FPS), #for use with IP cameras, it may be necessary to hardcode in your FPS since OpenCV has issues decyphering this value
+        video_info = [20, #hardcoding 20 fps for garcia river application
                       color_frame.get(cv2.CAP_PROP_FRAME_WIDTH),
                       color_frame.get(cv2.CAP_PROP_FRAME_HEIGHT)]
 
@@ -64,7 +64,7 @@ def main():
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
     max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
     min_tracker_hits = 2 #needs 2 detections to initialize tracker for an individual
-    min_pixel_distance = video_info[1]/3 #after traveling 33% of the width of the screen in pixels, the tracker will evict the tracked individual
+    min_pixel_distance = video_info[1]/8 #%12.5 of frame width
 
     ot = objectTracker(max_tracker_age, min_tracker_hits, min_pixel_distance)
 
@@ -90,8 +90,7 @@ def main():
 
         else:
             tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) 
-            travel_direction = direction.directionOutput(evicted_fish, args.stream_side, video_info[1])
-            jo.writeFile(evicted_fish, travel_direction) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+            jo.writeFile(evicted_fish) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         
 
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish
