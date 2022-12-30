@@ -15,21 +15,23 @@ class jsonOut:
 		with open(names_file, "r") as f:
 			self.class_names = [cname.strip() for cname in f.readlines()]
 
-	def writeFile(self, evicted_fish):
+	def writeFile(self, evicted_fish, frame_duration):
 		for fish in evicted_fish: #'NoneType' object is not iterable
 			json_data = [datetime.datetime.utcnow(), 
 		  				 self.site, 
 		  				 self.class_names[fish.class_id], 
 		  				 fish.max_confidence,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
-						 fish.fish_id]
+						 fish.fish_id,
+						 frame_duration]
 
 			filename = json_data[4]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[5])
 			json_file = {
 				"dateTime":str(json_data[0]),
 				"site":json_data[1],
 				"species":json_data[2],
-				"maxConfidence": np.float64(json_data[3])
+				"maxConfidence": np.float64(json_data[3]),
+				"durationInFrame": json_data[6]
 				}	
 			with open("{}/{}.json".format(self.directory, filename), 'w') as f:
 				json.dump(json_file, f)

@@ -1,0 +1,5 @@
+Jetson node 1(sticker): 192.168.1.24
+Jetson node 2: 192.168.1.25
+IP Camera node 1: 192.168.1.26
+IP Camera node 2: 192.168.1.27
+Gateway: 192.168.1.1

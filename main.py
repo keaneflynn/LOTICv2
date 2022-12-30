@@ -62,7 +62,7 @@ def main():
     oTest = outputTesting(args.names_file)
 
     #These are the only global variables that will likely have to be adjusted for specific use cases (depend on fish speed, model accuracy, etc.)
-    max_tracker_age = floor(video_info[0]) * 3 #takes 3 seconds for program to evict a tracked individual
+    max_tracker_age = floor(video_info[0]) * 1 #takes 3 seconds for program to evict a tracked individual
     min_tracker_hits = 2 #needs 2 detections to initialize tracker for an individual
     min_pixel_distance = video_info[1]/8 #%12.5 of frame width
 
@@ -89,8 +89,8 @@ def main():
             jo.writeFile_rs(evicted_fish, travel_direction, lengths) #output json with object length measurement
 
         else:
-            tracked_fish, evicted_fish = ot.update_tracker(classes, scores, boxes, frame) 
-            jo.writeFile(evicted_fish) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
+            tracked_fish, evicted_fish, frame_duration = ot.update_tracker(classes, scores, boxes, frame) 
+            jo.writeFile(evicted_fish, frame_duration) #when a fish is declared "evicted". all relevant information from that individual will be included in a .json file that is output
         
 
         vo.writeVideo(tracked_fish, frame) #when fish are absent from the video frame for a specified amount of time, an .avi file will be written out for all frames containing the fish

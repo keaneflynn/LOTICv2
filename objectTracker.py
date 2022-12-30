@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-import math  
+import math 
+import time 
 
 
 class Detection:
@@ -49,6 +50,7 @@ class Fish:
         self.hit_streak = 0
         self.frames_without_hit = 0
         self.first_center = [(box[2] // 2 + box[0]),(box[3] // 2 + box[1])]
+        self.start_time = time.time() #TEST
 
     def update_fish(self, box, score, frame, class_id):
         # updates state of tracked objects
@@ -150,6 +152,7 @@ class objectTracker:
 
         ret = []
         evicted = []
+        frame_duration = []
 
         # filter out dead tracked items, append ret with passing tracked_objects, and return ret
         for obj in self.tracked_objects:
@@ -157,15 +160,18 @@ class objectTracker:
                 self.tracked_objects.remove(obj) # removes individuals who timeout the object tracker criteria
 
             if (obj.hit_streak >= self.min_hits) and (obj.frames_without_hit >= self.max_age): # expels information on individuals no longer being considered in tracking algorithm
+                frame_duration.append(time.time() - obj.start_time) #Needs adjustment
                 evicted.append(obj)
+                print(frame_duration) #REMOVE
+                print(obj.start_time) #REMOVE
 
             if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits): # main return for currently tracked individuals
                 r = [obj.fish_id, obj.class_id, obj.max_confidence, obj.box]
                 ret.append(r)
 
         if len(ret) == 0:
-            return np.empty((0, 4)), evicted
-        return ret, evicted
+            return np.empty((0, 4)), evicted, frame_duration
+        return ret, evicted, frame_duration
 
 
 class direction:

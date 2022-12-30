@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SOURCE_FOLDER='/home/garcia/LOTIC/LOTICv2/outfile' #UPDATE WITH PROPER DIRECTIORY
-DESTINATION_FOLDER='/media/garcia/T7' #UPDATE WITH PROPER DIRECTIORY
+SOURCE_FOLDER='/home/garcia/LOTIC/LOTICv2/outfile'
+DESTINATION_FOLDER='/media/garcia/T7'
 SITENAME='site1' #UPDATE WITH SITENAME FOR EACH UNIQUE COMPUTER
 FILENAME=$(date '+%m-%d-%y_%H-%M-%S')_$SITENAME
 FLASH_CHECK=$(lsusb | grep 'Samsung' | wc -l)
@@ -29,7 +29,7 @@ zip -q $FILENAME *.avi *.json *.log
 rm *.avi && rm *.json && rm *.log 
 
 cd ~/ 
-udisksctl unmount -b /dev/sda1 #MIGHT NEED TO BE UPDATED FOR JETSONS
+udisksctl unmount -b /dev/sda1 
 udisksctl power-off -b /dev/sda1 
 exit 0
 
