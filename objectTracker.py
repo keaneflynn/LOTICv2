@@ -162,8 +162,6 @@ class objectTracker:
             if (obj.hit_streak >= self.min_hits) and (obj.frames_without_hit >= self.max_age): # expels information on individuals no longer being considered in tracking algorithm
                 frame_duration.append(time.time() - obj.start_time) #Needs adjustment
                 evicted.append(obj)
-                print(frame_duration) #REMOVE
-                print(obj.start_time) #REMOVE
 
             if (obj.frames_without_hit < 1) and (obj.hit_streak >= self.min_hits or self.frame_count <= self.min_hits): # main return for currently tracked individuals
                 r = [obj.fish_id, obj.class_id, obj.max_confidence, obj.box]

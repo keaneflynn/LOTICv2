@@ -23,7 +23,7 @@ class jsonOut:
 		  				 fish.max_confidence,
 						 datetime.datetime.now().strftime("%m-%d-%Y-%H-%M-%S"),
 						 fish.fish_id,
-						 frame_duration]
+						 frame_duration[0]]
 
 			filename = json_data[4]+'_'+json_data[1]+'_'+json_data[2]+'-'+str(json_data[5])
 			json_file = {
