@@ -1,0 +1,127 @@
+#!/bin/bash
+
+
+echo "checking upstream camera connectivity . . ."
+
+camera_connect_us=$(ping -c 5 192.168.1.27 | grep -c "ms")
+
+if [ $camera_connect_us -gt 2 ]
+then
+	echo "upstream camera is online"
+else
+	echo "upstream camera is offline"
+fi
+
+
+echo "checking downstream camera connectivity . . ."
+
+camera_connect_ds=$(ping -c 5 192.168.1.26 | grep -c "ms")
+
+if [ $camera_connect_ds -gt 2 ]
+then
+	echo "downstream camera is online"
+else
+	echo "downstream camera is offline"
+fi
+
+
+echo "checking upstream computer connectivity"
+
+computer_connect_us=$(ping -c 5 192.168.1.25 | grep -c "ms")
+
+if [ $computer_connect_us -gt 2 ]
+then
+	echo "upstream computer is online"
+else
+	echo "upstream computer is offline"
+	echo "terminating process . . . "
+	sleep 2
+	echo "Goodbye"
+	exit 1
+fi
+
+
+echo "checking downstream computer connectivity"
+
+computer_connect_ds=$(ping -c 5 192.168.1.24 | grep -c "ms")
+
+if [ $computer_connect_ds -gt 2 ]
+then
+	echo "downstream computer is online"
+else
+	echo "downstream computer is offline"
+	echo "terminating process . . . "
+	sleep 2
+	echo "Goodbye"
+	exit 1
+fi
+
+
+cd ~/Desktop/
+
+
+echo "Do you wish to copy all output files from downstream LOTIC? (y/n)"
+read RESP1
+if [ $RESP1 = "y" ] 
+then 
+	mkdir lotic_files_DS
+	scp -r garcia@192.168.1.24:/home/garcia/LOTIC/LOTICv2/outfile/ ./lotic_files_DS/
+	echo "Files successfully copied!"
+fi
+
+
+echo "Do you wish to delete all output files from downstream LOTIC? (y/n)"
+read RESP2
+if [ $RESP2 = "y" ]
+then
+	ssh garcia@192.168.1.24 << 'EOF'
+		rm -rf ~/LOTIC/LOTICv2/outfile/
+		echo "deleting files . . . "
+		sleep 3
+		echo "Done!"
+EOF
+fi
+
+
+echo "Do you wish to copy all output files from upstream LOTIC? (y/n)"
+read RESP1
+if [ $RESP1 = "y" ] 
+then 
+	mkdir lotic_files_US
+	scp -r garcia@192.168.1.25:/home/garcia/LOTIC/LOTICv2/outfile/ ./lotic_files_US/
+	echo "Files successfully copied!"
+fi
+
+
+echo "Do you wish to delete all output files from upstream LOTIC? (y/n)"
+read RESP2
+if [ $RESP2 = "y" ]
+then
+	ssh garcia@192.168.1.25 << 'EOF'
+		rm -rf ~/LOTIC/LOTICv2/outfile/
+		echo "deleting files . . . "
+		sleep 3
+		echo "Done!"
+EOF
+fi
+
+
+echo "Checking operating status of downstream LOTIC . . . "
+	sleep 3
+	ssh garcia@192.168.1.24 << 'EOF'
+		status=$(systemctl is-active lotic.service)
+		echo "LOTIC is $status"
+EOF
+
+
+echo "Checking operating status of upstream LOTIC . . . "
+	sleep 3
+	ssh garcia@192.168.1.25 << 'EOF'
+		status=$(systemctl is-active lotic.service)
+		echo "LOTIC is $status"
+EOF
+
+sleep 2
+
+echo "Have a good day Peter!"
+
